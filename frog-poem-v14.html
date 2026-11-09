@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Frog-ism Poem</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@400;600&family=Noto+Serif+SC&family=Playfair+Display&family=Space+Mono&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;height:100%;background:#000;color:#eee;font-family:Inter,Helvetica,Arial,sans-serif;overflow:hidden}
+  canvas{display:block}
+  button,label.btn{background:none;border:1px solid #888;color:#eee;padding:8px 18px;border-radius:999px;cursor:pointer;font-size:13px;font-family:inherit}
+  button:hover,label.btn:hover{background:#eee;color:#111}
+  input[type=range]{width:110px;flex:none}
+  .val{display:inline-block;min-width:38px;text-align:right;color:#d4d4d4;font-weight:400;font-variant-numeric:tabular-nums}
+  .r{display:flex;align-items:center;gap:8px}
+
+  /* ---- landing / intro page ---- */
+  #start{position:fixed;inset:0;z-index:15;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:18px;background:#0b0b0f;text-align:center;padding:64px 72px 48px;overflow:auto}
+  #start h1{font-family:'Playfair Display',Georgia,serif;font-weight:400;letter-spacing:.04em;margin:0;font-size:46px}
+  #start .tag{color:#d4d4d4;letter-spacing:.2em;font-size:12px;margin-top:-6px}
+  #start p{color:#aaa;max-width:600px;line-height:1.8;margin:0;font-size:14px;text-align:left}
+  #start .how{color:#777;letter-spacing:.3em;font-size:11px;margin-top:6px}
+  #start ol{color:#999;max-width:600px;text-align:left;line-height:1.8;font-size:13px;margin:0;padding-left:22px}
+  #start ol b{color:#ddd;font-weight:600}
+  #start .actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+  #start .foot{color:#666;font-size:11px;max-width:480px;line-height:1.6}
+  #msgL{color:#d4d4d4;min-height:1.3em;font-size:13px}
+
+  /* ---- settings sidebar ---- */
+  #bar{position:fixed;top:16px;left:16px;z-index:30;display:flex;gap:8px;transition:left .25s}
+  #bar button{display:flex;align-items:center;gap:8px;background:rgba(20,20,26,.85)}
+  #poemBtn.attn{border-color:#d4d4d4;color:#d4d4d4}
+  #beatDot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#d4d4d4;opacity:.2}
+  #side{position:fixed;top:0;left:0;bottom:0;width:340px;box-sizing:border-box;z-index:20;transform:translateX(-100%);transition:transform .25s;background:rgba(12,12,16,.94);backdrop-filter:blur(8px);border-right:1px solid #333;overflow-y:auto;padding:20px 16px 28px;display:flex;flex-direction:column;gap:14px}
+  body.open #side{transform:none}
+  body.open #bar{left:356px}
+  #side h1{font-size:13px;font-weight:400;letter-spacing:.3em;margin:0 0 2px;color:#ddd}
+  #side .sub{font-size:11px;color:#777;margin:0;line-height:1.5}
+  #side .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  #side .top button{padding:4px 12px;font-size:11px}
+  .panel{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;border:1px solid #333;border-radius:10px;padding:14px 16px;font-size:13px;color:#bbb;text-align:left}
+  .panel h3{margin:0;font-size:11px;font-weight:400;letter-spacing:.3em;color:#777}
+  .panel label{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .panel input[type=color]{width:38px;height:26px;border:none;background:none;padding:0;cursor:pointer}
+  .panel select{background:#15151b;color:#eee;border:1px solid #444;border-radius:6px;padding:4px 6px;max-width:150px}
+  .panel .btn{padding:6px 12px;font-size:12px;text-align:center;display:block}
+  .note{font-size:11px;color:#777;line-height:1.5}
+  #previewBox{height:72px;display:flex;align-items:center;overflow:hidden;border-radius:6px;padding:0 10px;box-sizing:border-box}
+  #preview{white-space:nowrap;overflow:hidden;max-width:100%}
+  #linePrev{width:100%;height:auto;border-radius:6px;border:1px solid #2a2a2a}
+  #msg{color:#d4d4d4;font-size:12px;min-height:1.2em}
+  #camstat{color:#d4d4d4;font-size:12px}
+
+  /* ---- intro page: frog border + origami frog ---- */
+  body.landing #bar{display:none}
+  body.landing #side{transform:translateX(-100%) !important}
+  #frogBorder{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+  #start > *:not(#frogBorder){position:relative;z-index:1}
+  #heroFrog,#heroFrog3{display:block;filter:drop-shadow(0 14px 18px rgba(0,0,0,.7));animation:hop 2.8s ease-in-out infinite}
+  @keyframes hop{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-10px) rotate(2deg)}}
+  #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:rgba(20,20,26,.94);border:1px solid #d4d4d4;color:#d4d4d4;padding:8px 16px;border-radius:999px;font-size:13px;z-index:40;display:none}
+  /* ---- audio tools (bottom panel) ---- */
+  #audio{position:fixed;left:0;right:0;bottom:0;height:min(48vh,400px);z-index:18;background:rgba(10,10,14,.96);border-top:1px solid #333;transform:translateY(100%);transition:transform .25s,left .25s;display:flex;flex-direction:column;padding:10px 16px 12px;box-sizing:border-box;backdrop-filter:blur(8px)}
+  body.audio-open #audio{transform:none}
+  body.open #audio{left:340px}
+  body.landing #audio{display:none}
+  .ahead{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:12px;color:#bbb;margin-bottom:8px}
+  .ahead b.t{font-weight:400;letter-spacing:.3em;color:#ddd}
+  .ahead .sp{flex:1}
+  .ahead button,.ahead label.btn{padding:5px 12px;font-size:12px}
+  .acols{display:flex;gap:22px;overflow:auto;flex:1;align-items:flex-start}
+  .acol{flex:none;font-size:12px;color:#bbb;display:grid;gap:7px;align-content:start}
+  .acol h4{margin:0 0 2px;font-size:10px;font-weight:400;letter-spacing:.3em;color:#777}
+  .acol label{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .acol .row2{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .drow{display:grid;grid-template-columns:32px 20px repeat(16,14px) 62px 62px 62px;gap:3px 2px;align-items:center}
+  .drow input[type=range]{width:62px}
+  .drow .dn{font-size:9px;color:#666;text-align:center}
+  .dl{font-size:9px;color:#777;letter-spacing:.05em}
+  .mbtn{padding:0;height:18px;font-size:9px;border-radius:3px;border:1px solid #444;color:#999}
+  .mbtn.on{background:#d4d4d4;color:#111}
+  .stp{display:block;height:18px;background:#1c1c24;border-radius:2px;cursor:pointer}
+  .stp.b{background:#2a2a38}
+  .stp.on{background:#e6e6e6}
+  .stp.cur{outline:1px solid #fff}
+  .stp.on.cur{background:#fff}
+  .arow{display:grid;grid-template-columns:62px 52px 70px 70px;gap:6px;align-items:center}
+  .arow input[type=range]{width:70px}
+  .arow .tg{padding:3px 0;font-size:11px;border-radius:4px}
+  .arow .tg.on{background:#d4d4d4;color:#111}
+  .acol select{background:#15151b;color:#eee;border:1px solid #444;border-radius:6px;padding:3px 5px;max-width:170px}
+  .pbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:6px 8px;border:1px solid #2c2c34;border-radius:8px;background:#14141a}
+  .pbar label{display:flex;align-items:center;gap:6px}
+  .pbar input[type=range]{width:74px}
+  .pbar .val{min-width:40px;font-size:11px}
+  #heroFrog3{touch-action:none;cursor:grab}
+</style>
+</head>
+<body class="landing">
+
+<div id="bar">
+  <button id="gear" title="Toggle the visual settings (S)">◐ Visual <i id="beatDot"></i></button>
+  <button id="audioBtn" title="Open / close the audio tools">🎚 Audio</button>
+  <button id="poemBtn" class="attn" title="Show the poem in its own window">▢ Poem view</button>
+  <button id="frogBtn" title="Show the poem mapped onto the frog">🐸 Frog view</button>
+</div>
+<div id="toast"></div>
+
+<!-- ============ Intro / landing page ============ -->
+<div id="start">
+  <canvas id="frogBorder"></canvas>
+  <canvas id="heroFrog" style="display:none"></canvas>
+  <canvas id="heroFrog3" style="display:none"></canvas>
+  <h1>Frog-ism Poem</h1>
+  <div class="tag">A WORKSHOP PERFORMANCE</div>
+  <p>Frog-ism Poem is a workshop performance that seeks to draw public attention to the experiences of women in tech, while highlighting academic research in the field. The first draft, which will also serve as the final presentation for ATCM 6377, will take place on November 18 before 4:00 PM in the Chamber on the third floor of the Edith O’ Donnell Arts and Technology Building.</p>
+  <p>The workshop performance consists of two parts. In the first part, I will guide participants in folding paper frogs, accompanied by a collective reading of a provided text. In the second part, I will reconstruct the text into a poem using an interactive, web-based poem-generation system driven by body tracking. Through freestyle dance, I will use my arm movements to select fragments of text displayed on the screen, which the system will transform into a reconstructed poem. My collaborator, Rabeeha Adnan, a PhD student in VPAS, will perform the resulting poem for the audience.</p>
+  <p>Through this performance, I shift the power from the content of the text to bodily gestures and poetry, dissolving the pressure and anxiety experienced by women in tech.</p>
+  <div class="how">HOW THE SYSTEM WORKS</div>
+  <ol>
+    <li><b>Load a text.</b> A PDF, .docx or .txt file, or try the sample text.</li>
+    <li><b>Allow the camera</b> and step back until both arms are in frame.</li>
+    <li><b>Sweep your arms</b> through the words to pick them. The poem writes itself in the order of your gestures.</li>
+    <li><b>Perform.</b> Open ◐ Visual and 🎚 Audio at any time to change type, colors, layers, sounds and tempo live. Enable the drums and the words fall on their beat. The poem has its own window (▢ Poem view), and 🐸 Frog view maps it onto the origami frog. Drag either window to a second screen or projector.</li>
+  </ol>
+  <div class="actions">
+    <label class="btn">Choose file<input id="fileL" type="file" accept=".pdf,.docx,.txt,.md" hidden></label>
+    <button id="demoL">Try with sample text</button>
+    <button id="resume" style="display:none">Back to performance</button>
+  </div>
+  <div id="msgL"></div>
+  <div class="foot">Your text and camera stay on your computer; nothing is uploaded. Use Chrome or Edge, and allow camera access and pop-ups when asked, so the webcam and the poem view can open.</div>
+</div>
+
+<!-- ============ Settings sidebar (available in performance mode) ============ -->
+<aside id="side">
+  <div class="top">
+    <div>
+      <h1>FROG-ISM POEM</h1>
+      <div class="sub">Performance mode: change anything live while you perform.</div>
+    </div>
+    <button id="about">About</button>
+  </div>
+
+  <div class="panel">
+    <h3>SOURCE</h3>
+    <label class="btn">Choose file (.pdf .docx .txt)<input id="file" type="file" accept=".pdf,.docx,.txt,.md" hidden></label>
+    <button id="demo">Try with sample text</button>
+    <div id="msg"></div>
+  </div>
+
+  <div class="panel">
+    <h3>LAYERS</h3>
+    <div class="note">Bottom to top: background, webcam, overlay, words, arm line.</div>
+    <label>Webcam opacity <span class="r"><input type="range" id="camOp" min="0" max="100" value="55"><b class="val" id="camOpV"></b></span></label>
+    <label>Overlay source
+      <select id="ovSrc">
+        <option value="none">None</option>
+        <option value="webcam">Webcam</option>
+        <option value="image">Image</option>
+        <option value="video">Video</option>
+      </select>
+    </label>
+    <label>Overlay opacity <span class="r"><input type="range" id="ovOp" min="0" max="100" value="40"><b class="val" id="ovOpV"></b></span></label>
+    <label>Overlay blend
+      <select id="ovBlend">
+        <option value="source-over">Normal</option>
+        <option value="screen">Screen</option>
+        <option value="multiply">Multiply</option>
+        <option value="overlay">Overlay</option>
+        <option value="difference">Difference</option>
+      </select>
+    </label>
+    <label>Arm line opacity <span class="r"><input type="range" id="lineOp" min="0" max="100" value="100"><b class="val" id="lineOpV"></b></span></label>
+    <label>Arm line fill
+      <select id="lineFill">
+        <option value="solid">Solid color</option>
+        <option value="webcam">Webcam</option>
+        <option value="image">Image</option>
+        <option value="video">Video</option>
+      </select>
+    </label>
+    <label class="btn">Upload image or video<input id="mediaFile" type="file" accept="image/*,video/*" hidden></label>
+    <div class="note" id="mediaName">No image or video loaded yet.</div>
+    <div id="camstat">Camera starts when you load a text.</div>
+  </div>
+
+  <div class="panel">
+    <h3>ARM VISUAL</h3>
+    <label>Style
+      <select id="armStyle">
+        <option value="line">Line</option>
+        <option value="ribbons">Ribbons (curves)</option>
+        <option value="trails">Trails (body path)</option>
+        <option value="particles">Particles</option>
+        <option value="web">Constellation</option>
+      </select>
+    </label>
+    <label>Intensity <span class="r"><input type="range" id="armInt" min="20" max="200" value="100"><b class="val" id="armIntV"></b></span></label>
+    <div class="note">Touching words still uses the arm line; the style only changes how it looks. The preview in COLOR shows the basic line.</div>
+  </div>
+
+  <div class="panel">
+    <h3>COLOR</h3>
+    <canvas id="linePrev" width="266" height="110"></canvas>
+    <label>Arm line <input type="color" id="cLine" value="#ff2a2a"></label>
+    <label>Picked word <input type="color" id="cSel" value="#ffffff"></label>
+    <label>Text <input type="color" id="cText" value="#ebebeb"></label>
+    <label>Background <input type="color" id="cBg" value="#000000"></label>
+    <label>Line width <span class="r"><input type="range" id="wLine" min="1" max="16" value="5"><b class="val" id="wLineV"></b></span></label>
+    <label>Pick delay <span class="r"><input type="range" id="cool" min="0" max="1000" step="50" value="300"><b class="val" id="coolV"></b></span></label>
+  </div>
+
+  <div class="panel">
+    <h3>TYPE</h3>
+    <label>Font
+      <select id="fontSel">
+        <option value="Georgia, serif">Georgia</option>
+        <option value="'Playfair Display', serif">Playfair Display</option>
+        <option value="'Cormorant Garamond', serif">Cormorant Garamond</option>
+        <option value="Inter, Helvetica, Arial, sans-serif">Inter</option>
+        <option value="Helvetica, Arial, sans-serif">Helvetica / Arial</option>
+        <option value="'Space Mono', monospace">Space Mono</option>
+        <option value="'Courier New', monospace">Courier New</option>
+        <option value="'Noto Serif SC', 'Songti SC', serif">Noto Serif SC (CJK)</option>
+      </select>
+    </label>
+    <label class="btn">Upload font (.ttf .otf .woff)<input id="fontFile" type="file" accept=".ttf,.otf,.woff,.woff2" hidden></label>
+    <label>Text size <span class="r"><input type="range" id="fSize" min="14" max="90" value="40"><b class="val" id="fSizeV"></b></span></label>
+    <label>Size variation <span class="r"><input type="range" id="fVar" min="0" max="60" value="30"><b class="val" id="fVarV"></b></span></label>
+    <div id="previewBox"><div id="preview">The body remembers</div></div>
+  </div>
+
+  <div class="panel">
+    <h3>WORDS &amp; RHYTHM</h3>
+    <label>Split text into
+      <select id="splitSel">
+        <option value="words">Single words</option>
+        <option value="phrases">Phrases</option>
+        <option value="sentences">Sentences</option>
+      </select>
+    </label>
+    <label>Tempo (BPM) <span class="r"><input type="range" id="bpm" min="30" max="240" value="70"><b class="val" id="bpmV"></b></span></label>
+    <label>Scroll speed <span class="r"><input type="range" id="speed" min="0.2" max="3" step="0.1" value="1"><b class="val" id="speedV"></b></span></label>
+  </div>
+  <div class="panel">
+    <h3>POEM</h3>
+    <button id="openPoem">Open poem view</button>
+    <label>Auto-scroll <input type="checkbox" id="pAuto" checked></label>
+    <label>Sync to tempo (1 line per beat) <input type="checkbox" id="pSync" checked></label>
+    <label>Scroll speed <span class="r"><input type="range" id="pSpeed" min="0" max="3" step="0.1" value="1"><b class="val" id="pSpeedV"></b></span></label>
+    <label>Poem text size <span class="r"><input type="range" id="pSize" min="16" max="80" value="32"><b class="val" id="pSizeV"></b></span></label>
+    <label>Poem text color <input type="color" id="pColor" value="#ffffff"></label>
+    <div style="display:flex;gap:8px"><button id="save">Download .txt</button><button id="clear">Clear</button></div>
+    <div class="note" id="poemStat">Poem view closed. Picked words are still collected.</div>
+  </div>
+  <div class="panel">
+    <h3>FROG VIEW</h3>
+    <button id="openFrog">Open frog view</button>
+    <label>Paper color <input type="color" id="fPaper" value="#f3efe6"></label>
+    <label>Ink color <input type="color" id="fInk" value="#1b1b1f"></label>
+    <label>Text size <span class="r"><input type="range" id="fText" min="8" max="40" value="16"><b class="val" id="fTextV"></b></span></label>
+    <label>Scroll speed <span class="r"><input type="range" id="fSpeed" min="0" max="4" step="0.1" value="1"><b class="val" id="fSpeedV"></b></span></label>
+    <label>Sync to tempo <input type="checkbox" id="fSync" checked></label>
+    <label class="btn">Load 3D frog (.glb)<input id="glbFile" type="file" accept=".glb,.gltf" hidden></label>
+    <button id="glbReset">Use default frog</button>
+    <label>3D spin speed <input type="range" id="fSpin" min="0" max="3" step="0.1" value="0.5"></label>
+    <div class="note" id="glbStat">Using the paper frog.</div>
+    <div class="note" id="frogStat">Frog view closed.</div>
+  </div>
+</aside>
+
+<section id="audio">
+  <div class="ahead">
+    <b class="t">AUDIO TOOLS</b>
+    <label>Tempo <input type="range" id="bpmA" min="30" max="240" value="70"><b class="val" id="bpmAV"></b></label>
+    <label>Master <input type="range" id="aVol" min="0" max="100" value="70"><b class="val" id="aVolV"></b></label>
+    <span class="sp"></span>
+    <button id="aSave">Save preset (.json)</button>
+    <label class="btn">Load preset<input id="aLoad" type="file" accept=".json,application/json" hidden></label>
+    <button id="aClose">▾ Hide</button>
+  </div>
+  <div class="acols">
+    <div class="acol" id="colDrums">
+      <h4>A · DRUM MACHINE</h4>
+      <div class="pbar">
+        <label><input type="checkbox" id="drumOn"> Enable drums</label>
+        <label>Vol <input type="range" id="drVol" min="0" max="100" value="80"><b class="val" id="drVolV"></b></label>
+        <label>Pitch <input type="range" id="drPitch" min="-12" max="12" step="1" value="0"><b class="val" id="drPitchV"></b></label>
+      </div>
+      <div class="row2">
+        <select id="kitSel"><option>808</option><option>Tight</option><option>Deep</option><option>Lo-fi</option><option>Glitch</option></select>
+        <select id="drumPreset"><option>Four on the floor</option><option>Breakbeat</option><option>Minimal</option><option>Empty</option></select>
+        <button id="drumClear" style="padding:3px 10px;font-size:11px">Clear pattern</button>
+      </div>
+      <div id="drumRows" style="display:grid;gap:4px"></div>
+    </div>
+    <div class="acol" id="colAmb" style="width:340px">
+      <h4>B · AMBIENCE + SYNTHS</h4>
+      <div class="pbar">
+        <label>Vol <input type="range" id="ambVol" min="0" max="100" value="80"><b class="val" id="ambVolV"></b></label>
+        <label>Pitch <input type="range" id="ambPitch" min="-12" max="12" step="1" value="0"><b class="val" id="ambPitchV"></b></label>
+      </div>
+      <div id="ambRows" style="display:grid;gap:6px"></div>
+      <div class="note">Every layer is synthesized live. The slider after ON is the layer volume, the last one shapes its tone (filter, tremolo speed or register).</div>
+    </div>
+    <div class="acol" id="colPick" style="width:300px">
+      <h4>C · WORD-PICK SOUND</h4>
+      <div class="pbar">
+        <label><input type="checkbox" id="pkOn" checked> Enable</label>
+        <label>Vol <input type="range" id="pkVol" min="0" max="100" value="80"><b class="val" id="pkVolV"></b></label>
+        <label>Pitch <input type="range" id="pkPitch" min="-12" max="12" step="1" value="0"><b class="val" id="pkPitchV"></b></label>
+      </div>
+      <label>Instrument <select id="pkInst"><option>Pluck</option><option>Bell</option><option>Marimba</option><option>Glass pad</option><option>Croak</option><option>Blip</option><option>Click</option></select></label>
+      <label>Scale <select id="pkScale"><option>Pentatonic</option><option>Major</option><option>Minor</option><option>Whole tone</option><option>Chromatic</option></select></label>
+      <label>Delay mix <input type="range" id="pkFx" min="0" max="100" value="35"></label>
+      <label>Reverb mix <input type="range" id="pkRev" min="0" max="100" value="30"></label>
+      <label>Snap to the beat <input type="checkbox" id="pkSnap" checked></label>
+      <button id="pkTest" style="padding:4px 10px;font-size:12px">▶ Preview sound</button>
+      <div class="note">Each picked word plays one note. Its pitch comes from the word's letters, mapped onto the chosen scale, plus the Pitch bar. The note goes dry to the mix and through a tempo-synced delay and a reverb.</div>
+    </div>
+    <div class="acol" id="colVoice" style="width:300px">
+      <h4>D · VOICE</h4>
+      <div class="pbar">
+        <label><input type="checkbox" id="vOn"> Enable</label>
+        <label>Vol <input type="range" id="vVol" min="0" max="100" value="90"><b class="val" id="vVolV"></b></label>
+        <label>Pitch <input type="range" id="vPitch" min="0" max="2" step="0.05" value="1"><b class="val" id="vPitchV"></b></label>
+      </div>
+      <label>Voice <select id="vSel"></select></label>
+      <label>Rate <input type="range" id="vRate" min="0.5" max="2" step="0.05" value="0.9"></label>
+      <label>Echo repeats <input type="range" id="vEcho" min="0" max="4" step="1" value="2"></label>
+      <label>Echo spacing <select id="vSpace"><option value="1/16">1/16 note</option><option value="1/8">1/8 note</option><option value="3/16" selected>dotted 1/8</option><option value="1/4">1/4 note</option></select></label>
+      <label>Echo fade <input type="range" id="vDecay" min="20" max="90" value="60"></label>
+      <label>Echo pitch drift <input type="range" id="vDrift" min="-6" max="6" step="1" value="-2"></label>
+      <label>Snap to the beat <input type="checkbox" id="vSnap" checked></label>
+      <div class="note">Browsers cannot send their built-in voice through effects, so the voice echoes are repeats timed to the tempo.</div>
+    </div>
+  </div>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ml5@1.1.0/dist/ml5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+const $ = id => document.getElementById(id);
+const msg = t => { $("msg").textContent = t; $("msgL").textContent = t; };
+const stat = t => $("camstat").textContent = t;
+let toastTimer;
+const toast = t => { const e = $("toast"); e.textContent = t; e.style.display = "block"; clearTimeout(toastTimer); toastTimer = setTimeout(() => e.style.display = "none", 4500); };
+const sideOpen = () => document.body.classList.contains("open");
+
+// ---------- Origami frog geometry (shared by the intro page, the border frogs and the Frog view) ----------
+// axis = angle of the text lines inside a facet, sign = direction they scroll: every facet moves its own way
+const FROG = (() => {
+  const mir = ps => ps.map(([x, y]) => [400 - x, y]);
+  const headL = [[200, 34], [116, 118], [122, 178], [200, 178]];
+  const torsoL = [[122, 178], [200, 178], [200, 326], [142, 272]];
+  const FL = [[122, 178], [50, 196], [22, 286], [80, 250], [124, 224]];
+  const BL = [[146, 246], [38, 236], [86, 384], [134, 330], [104, 292], [164, 302]];
+  const facets = [
+    { pts: BL, shade: .74, axis: -75, sign: -1 }, { pts: mir(BL), shade: .62, axis: 75, sign: 1 },
+    { pts: FL, shade: .86, axis: -65, sign: -1 }, { pts: mir(FL), shade: .72, axis: 65, sign: 1 },
+    { pts: torsoL, shade: .92, axis: 90, sign: 1 }, { pts: mir(torsoL), shade: .8, axis: -90, sign: 1 },
+    { pts: headL, shade: 1, axis: 0, sign: -1 }, { pts: mir(headL), shade: .9, axis: 0, sign: 1 },
+  ];
+  facets.forEach(f => {
+    f.cx = f.pts.reduce((a, p) => a + p[0], 0) / f.pts.length; f.cy = f.pts.reduce((a, p) => a + p[1], 0) / f.pts.length;
+    f.r = Math.max(...f.pts.map(p => Math.hypot(p[0] - f.cx, p[1] - f.cy)));
+  });
+  return { facets, eyes: [[150, 100], [250, 100]], box: { x: 14, y: 24, w: 372, h: 372 } };
+})();
+const hexToRgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+const shadeCol = (rgb, k) => `rgb(${Math.round(rgb[0] * k)},${Math.round(rgb[1] * k)},${Math.round(Math.min(255, rgb[2] * k + (1 - k) * 14))})`;
+function tracePath(g, pts) { g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.closePath(); }
+function paintEyes(g, paper, ink, edge, w) {
+  FROG.eyes.forEach(([x, y]) => {
+    g.beginPath(); g.arc(x, y, 16, 0, 6.2832); g.fillStyle = paper; g.fill(); g.strokeStyle = edge; g.lineWidth = w; g.stroke();
+    g.beginPath(); g.arc(x, y, 6, 0, 6.2832); g.fillStyle = ink; g.fill();
+  });
+}
+function paintFrog(g, paper, edge, edgeW) {   // the plain paper frog, no text
+  const rgb = hexToRgb(paper);
+  FROG.facets.forEach(f => { tracePath(g, f.pts); g.fillStyle = shadeCol(rgb, f.shade); g.fill(); g.strokeStyle = edge; g.lineWidth = edgeW; g.lineJoin = "round"; g.stroke(); });
+  paintEyes(g, paper, "#28283a", edge, edgeW);
+}
+
+// big frog in the middle of the intro page
+(function () {
+  const c = $("heroFrog"), dpr = 2, w = 250, h = Math.round(w * FROG.box.h / FROG.box.w), sc = w / FROG.box.w;
+  c.width = w * dpr; c.height = h * dpr; c.style.width = w + "px"; c.style.height = h + "px";
+  const g = c.getContext("2d"); g.scale(dpr * sc, dpr * sc); g.translate(-FROG.box.x, -FROG.box.y);
+  paintFrog(g, "#f3efe6", "rgba(70,70,85,.55)", 2);
+})();
+
+// little frogs marching around the border of the intro page
+const SPR = (() => {   // sprite of the little border frogs; filled from the 3D model (or from the paper frog if the model is missing)
+  const sc = 0.125, w = FROG.box.w * sc + 6, h = FROG.box.h * sc + 6, c = document.createElement("canvas");
+  c.width = w * 2; c.height = h * 2;
+  const draw2D = () => {
+    const g = c.getContext("2d"); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, c.width, c.height);
+    g.scale(2 * sc, 2 * sc); g.translate(-FROG.box.x + 3 / sc, -FROG.box.y + 3 / sc); paintFrog(g, "#f3efe6", "rgba(70,70,85,.6)", 5);
+  };
+  return { c, w, h, ready: false, draw2D };
+})();
+function pathAt(s, m, r, W, H) {   // position + heading on a rounded rectangle, clockwise
+  const a = W - 2 * r, b = H - 2 * r, q = Math.PI * r / 2, segs = [a, q, b, q, a, q, b, q];
+  let i = 0; while (s > segs[i]) { s -= segs[i]; i = (i + 1) % 8; }
+  switch (i) {
+    case 0: return { x: m + r + s, y: m, a: 0 };
+    case 1: { const t = -Math.PI / 2 + s / r; return { x: m + W - r + r * Math.cos(t), y: m + r + r * Math.sin(t), a: t + Math.PI / 2 }; }
+    case 2: return { x: m + W, y: m + r + s, a: Math.PI / 2 };
+    case 3: { const t = s / r; return { x: m + W - r + r * Math.cos(t), y: m + H - r + r * Math.sin(t), a: t + Math.PI / 2 }; }
+    case 4: return { x: m + W - r - s, y: m + H, a: Math.PI };
+    case 5: { const t = Math.PI / 2 + s / r; return { x: m + r + r * Math.cos(t), y: m + H - r + r * Math.sin(t), a: t + Math.PI / 2 }; }
+    case 6: return { x: m, y: m + H - r - s, a: 1.5 * Math.PI };
+    default: { const t = Math.PI + s / r; return { x: m + r + r * Math.cos(t), y: m + r + r * Math.sin(t), a: t + Math.PI / 2 }; }
+  }
+}
+const bc = $("frogBorder"), bg = bc.getContext("2d");
+function borderFrame(ms) {
+  requestAnimationFrame(borderFrame);
+  if ($("start").style.display === "none" || !SPR.ready) return;   // only while the intro page is visible and a frog exists
+  const dpr = Math.min(2, devicePixelRatio || 1), w = innerWidth, h = innerHeight;
+  if (bc.width !== Math.round(w * dpr) || bc.height !== Math.round(h * dpr)) { bc.width = Math.round(w * dpr); bc.height = Math.round(h * dpr); }
+  bg.setTransform(dpr, 0, 0, dpr, 0, 0); bg.clearRect(0, 0, w, h);
+  const m = 30, W = w - 2 * m, H = h - 2 * m, r = Math.max(8, Math.min(34, W / 4, H / 4));
+  const P = 2 * (W - 2 * r) + 2 * (H - 2 * r) + 2 * Math.PI * r, n = Math.max(6, Math.round(P / 64)), step = P / n, off = (ms * 0.03) % step;   // 30 px/s
+  for (let i = 0; i < n; i++) {
+    const p = pathAt((i * step + off) % P, m, r, W, H), k = 1 + 0.12 * Math.sin(ms / 260 + i * 0.8);
+    bg.save(); bg.translate(p.x, p.y); bg.rotate(p.a + Math.PI / 2); bg.scale(k, k);
+    bg.drawImage(SPR.c, -SPR.w / 2, -SPR.h / 2, SPR.w, SPR.h); bg.restore();
+  }
+}
+requestAnimationFrame(borderFrame);
+
+// ---------- Sidebar + landing page ----------
+$("gear").onclick = () => document.body.classList.toggle("open");
+addEventListener("keydown", e => {
+  if (e.key.toLowerCase() === "s" && !document.body.classList.contains("landing") && !/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) document.body.classList.toggle("open");
+});
+const showLanding = on => { $("start").style.display = on ? "flex" : "none"; document.body.classList.toggle("landing", on); };
+$("about").onclick = () => { $("resume").style.display = running ? "inline-block" : "none"; showLanding(true); };
+$("resume").onclick = () => showLanding(false);
+
+// ---------- Settings (remembered between visits) ----------
+const SETTINGS = ["armStyle", "armInt", "pColor", "fPaper", "fInk", "fText", "fSpeed", "pSize", "cLine", "cSel", "cText", "cBg", "wLine", "cool", "fontSel", "fSize", "fVar", "splitSel", "bpm", "speed", "pSpeed",
+                  "camOp", "ovSrc", "ovOp", "ovBlend", "lineOp", "lineFill"];
+try {
+  const saved = JSON.parse(localStorage.getItem("armPoem3") || "{}");
+  SETTINGS.forEach(k => {
+    const v = saved[k];
+    if (v === undefined || String(v).includes("CustomFont")) return;
+    if ((k === "ovSrc" || k === "lineFill") && (v === "image" || v === "video")) return;   // uploaded media is not remembered
+    $(k).value = v;
+    if ($(k).tagName === "SELECT" && $(k).selectedIndex < 0) $(k).selectedIndex = 0;
+  });
+} catch (e) {}
+const saveSettings = () => {
+  try { localStorage.setItem("armPoem3", JSON.stringify(Object.fromEntries(SETTINGS.map(s => [s, $(s).value])))); } catch (e) {}
+};
+function showVals() {
+  $("wLineV").textContent = $("wLine").value;
+  $("coolV").textContent = $("cool").value + "ms";
+  $("fSizeV").textContent = $("fSize").value;
+  $("fVarV").textContent = $("fVar").value + "%";
+  $("bpmV").textContent = $("bpm").value;
+  $("speedV").textContent = (+$("speed").value).toFixed(1) + "×";
+  $("pSizeV").textContent = $("pSize").value + "px";
+  $("armIntV").textContent = $("armInt").value + "%";
+  $("fTextV").textContent = $("fText").value + "px";
+  $("fSpeedV").textContent = (+$("fSpeed").value).toFixed(1) + "×";
+  $("pSpeedV").textContent = (+$("pSpeed").value).toFixed(1) + "×";
+  $("camOpV").textContent = $("camOp").value + "%";
+  $("ovOpV").textContent = $("ovOp").value + "%";
+  $("lineOpV").textContent = $("lineOp").value + "%";
+}
+function updatePreview() {
+  const p = $("preview");
+  p.style.fontFamily = $("fontSel").value;
+  p.style.fontSize = Math.min(+$("fSize").value, 56) + "px";   // capped so the preview box never changes size
+  p.style.color = $("cText").value;
+  $("previewBox").style.background = $("cBg").value;
+}
+SETTINGS.forEach(k => $(k).addEventListener("input", () => { saveSettings(); updatePreview(); showVals(); }));
+updatePreview(); showVals();
+const col = (id, a = 255) => { const c = color($(id).value); c.setAlpha(a); return c; };
+
+// ---------- Live arm-line preview (COLOR panel) ----------
+const lc = $("linePrev"), lx = lc.getContext("2d");
+function linePreview(t) {
+  requestAnimationFrame(linePreview);
+  if (!sideOpen()) return;
+  const W = lc.width, H = lc.height;
+  lx.clearRect(0, 0, W, H); lx.fillStyle = $("cBg").value; lx.fillRect(0, 0, W, H);
+  const th = -0.55 + 0.45 * Math.sin(t / 700);
+  const S = { x: 18, y: H - 14 }, E = { x: 66, y: H - 48 };
+  const Wr = { x: E.x + Math.cos(th) * 62, y: E.y + Math.sin(th) * 62 };
+  const T = { x: Wr.x + (Wr.x - E.x) * 0.45, y: Wr.y + (Wr.y - E.y) * 0.45 };
+  lx.font = `20px ${$("fontSel").value}`; lx.textBaseline = "middle";
+  const wd = lx.measureText("remembers").width, bx = 130, by = 32;
+  const hot = segRect(E.x, E.y, Wr.x, Wr.y, bx - 10, by - 24, wd + 20, 48) || segRect(Wr.x, Wr.y, T.x, T.y, bx - 10, by - 24, wd + 20, 48);
+  lx.fillStyle = hot ? $("cLine").value : $("cText").value; lx.fillText("remembers", bx, by);
+  lx.fillStyle = $("cSel").value; lx.fillText("picked", bx, 86);
+  PV.arms.left = { S, E, W: Wr, T, pT: pvT || T }; pvT = T;   // a fake arm, drawn with the selected arm style
+  updateTrails(PV, 1);
+  lx.globalAlpha = +$("lineOp").value / 100;
+  paintArms(lx, $("cLine").value, [[S, E], [E, Wr], [Wr, T]], [T], PV);
+  lx.globalAlpha = 1;
+}
+requestAnimationFrame(linePreview);
+
+// ---------- Fonts ----------
+let curFont = $("fontSel").value, customCount = 0;
+async function applyFont() {
+  const f = $("fontSel").value;
+  curFont = f; updatePreview();   // switch right away, every word on screen follows
+  try { await document.fonts.load(`${$("fSize").value}px ${f}`); } catch (e) {}
+}
+$("fontSel").addEventListener("input", applyFont);
+$("fontFile").onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try {
+    const name = "CustomFont" + (++customCount), buf = await f.arrayBuffer();
+    const face = new FontFace(name, buf);
+    await face.load(); document.fonts.add(face);
+    const cf = { name, buf }; customFonts.push(cf); [pw, fw].forEach(w => { if (w && !w.closed) addPopupFont(cf, w); });
+    const opt = document.createElement("option");
+    opt.value = `'${name}', serif`; opt.textContent = "★ " + f.name.replace(/\.[^.]+$/, "");
+    $("fontSel").appendChild(opt); $("fontSel").value = opt.value;
+    applyFont();
+  } catch (err) { msg("Could not load that font file."); }
+};
+
+// ---------- Image / video media (overlay layer + arm line fill) ----------
+const media = { image: null, video: null };
+$("mediaFile").onchange = e => {
+  const f = e.target.files[0]; if (!f) return;
+  const url = URL.createObjectURL(f);
+  if (f.type.startsWith("video")) {
+    const v = document.createElement("video");
+    v.src = url; v.loop = true; v.muted = true; v.playsInline = true; v.play().catch(() => {});
+    media.video = v; $("mediaName").textContent = "Video loaded: " + f.name + ". Choose Video as the overlay source or arm line fill.";
+  } else {
+    const im = new Image(); im.src = url;
+    media.image = im; $("mediaName").textContent = "Image loaded: " + f.name + ". Choose Image as the overlay source or arm line fill.";
+  }
+  e.target.value = "";
+};
+function srcEl(kind) {   // the element to draw for a given source name, or null if it is not ready
+  if (kind === "webcam") return video && video.elt && video.elt.readyState >= 2 ? video.elt : null;
+  if (kind === "video") return media.video && media.video.readyState >= 2 ? media.video : null;
+  if (kind === "image") return media.image && media.image.complete && media.image.naturalWidth ? media.image : null;
+  return null;
+}
+function drawCover(ctx, el, w, h, mirror) {
+  const ew = el.videoWidth || el.naturalWidth, eh = el.videoHeight || el.naturalHeight;
+  if (!ew) return;
+  const s = Math.max(w / ew, h / eh), dw = ew * s, dh = eh * s;
+  ctx.save(); if (mirror) { ctx.translate(w, 0); ctx.scale(-1, 1); }
+  ctx.drawImage(el, (w - dw) / 2, (h - dh) / 2, dw, dh); ctx.restore();
+}
+
+// ---------- File reading & splitting ----------
+async function readFile(f) {
+  const name = f.name.toLowerCase();
+  if (name.endsWith(".pdf")) {
+    const pdf = await pdfjsLib.getDocument({ data: await f.arrayBuffer() }).promise;
+    let out = "";
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const c = await (await pdf.getPage(i)).getTextContent();
+      c.items.forEach(it => { out += it.str + (it.hasEOL ? "\n" : " "); });
+      out += "\n";
+    }
+    return out;
+  }
+  if (name.endsWith(".docx")) return (await mammoth.extractRawText({ arrayBuffer: await f.arrayBuffer() })).value;
+  if (name.endsWith(".doc")) throw new Error("Old .doc files are not supported. In Word, save as .docx or PDF.");
+  return await f.text();
+}
+const segmenter = (typeof Intl !== "undefined" && Intl.Segmenter) ? new Intl.Segmenter(undefined, { granularity: "word" }) : null;
+function toSegments(text) {
+  const mode = $("splitSel").value;
+  text = text.replace(/\u00ad/g, "").replace(/(\p{L})-\s*\n\s*(\p{L})/gu, "$1$2");   // re-join words hyphenated across lines
+  let out;
+  if (mode === "words") {   // also works for Chinese/Japanese (no spaces) via Intl.Segmenter
+    out = segmenter ? [...segmenter.segment(text)].filter(s => s.isWordLike).map(s => s.segment)
+                    : text.split(/[\s.,;:!?()"“”‘’\[\]]+/);
+    out = out.map(w => w.replace(/^[-'’]+|[-'’]+$/g, "")).filter(w => /\p{L}/u.test(w));
+  } else if (mode === "sentences") {
+    out = text.replace(/\s*\n\s*/g, " ").split(/(?<=[.!?。！？…])\s*/)
+      .map(s => s.replace(/\s+/g, " ").trim()).filter(s => s.length >= 2 && s.length <= 80);
+  } else {
+    out = text.split(/[\n\r。！？!?；;，,、：:]+|\.\s/)
+      .map(s => s.replace(/\s+/g, " ").trim()).filter(s => s.length >= 2 && s.length <= 40);
+  }
+  return out.slice(0, 5000);
+}
+async function onFile(e) {
+  const f = e.target.files[0]; if (!f) return;
+  try { msg("Reading…"); await loadText(await readFile(f)); } catch (err) { msg(err.message); }
+  e.target.value = "";
+}
+const SAMPLE =
+  "The body remembers what the mind forgets. Clay holds the shape of a hand. Light travels without memory. " +
+  "A machine dreams in the dark. Every touch is a kind of writing. We walk along the edge of memory. " +
+  "The wind scatters names. Dust learns the language of rain. Somewhere a door is still open. " +
+  "Your shadow arrives before you do. Silence has a weight and a grain.";
+$("file").onchange = onFile; $("fileL").onchange = onFile;
+$("demo").onclick = $("demoL").onclick = () => loadText(SAMPLE);
+$("splitSel").addEventListener("input", () => { if (rawText) { segs = toSegments(rawText); qi = 0; items = []; msg(segs.length + " pieces"); } });
+
+// ---------- State ----------
+let video, bodyPose, poses = [], rawText = "", segs = [], qi = 0, items = [], poem = [], lineLayer, lineCtx;
+let running = false, camStarted = false, nextBeat = 0, beatNo = 0, beatFlash = 0, lastPick = 0;
+const PANEL_W = 300, SMOOTH = 0.6, CONF = 0.25;   // SMOOTH: lower = follows arm more closely but jitters
+const arms = { left: null, right: null }, miss = { left: 0, right: 0 };
+
+async function loadText(raw) {   // can be called any time, also during the performance
+  const s = toSegments(raw);
+  if (!s.length) return msg("No text found (scanned PDFs need OCR first).");
+  rawText = raw; segs = s; qi = 0; items = [];
+  msg(s.length + " pieces loaded");
+  showLanding(false);
+  if (!running) {
+    running = true; nextBeat = 0;
+    await applyFont();
+    document.body.classList.remove("open");   // first load: close the sidebar so the scene is visible
+    startCamera();
+  }
+}
+
+async function startCamera() {
+  if (camStarted) return; camStarted = true;
+  try {
+    if (!navigator.mediaDevices) throw new Error("open this page via http://localhost or https");
+    (await navigator.mediaDevices.getUserMedia({ video: true })).getTracks().forEach(t => t.stop());
+  } catch (err) { stat("No camera: " + (err.message || err.name) + " (using mouse)"); return; }
+  stat("loading pose model…");
+  video = createCapture({ video: { width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 30 } }, audio: false }, () => stat("camera on"));
+  video.size(640, 480); video.hide();
+  bodyPose = ml5.bodyPose("MoveNet", { modelType: "SINGLEPOSE_LIGHTNING", flipped: true }, () => {
+    stat("tracking: step back so your arms are in frame");
+    bodyPose.detectStart(video, r => { poses = r; });
+  });
+}
+
+function setup() {
+  pixelDensity(1);
+  createCanvas(windowWidth, windowHeight);
+  lineLayer = document.createElement("canvas"); lineLayer.width = width; lineLayer.height = height; lineCtx = lineLayer.getContext("2d");
+  textAlign(LEFT, CENTER); strokeCap(ROUND); strokeJoin(ROUND);
+}
+function windowResized() { resizeCanvas(windowWidth, windowHeight); lineLayer.width = width; lineLayer.height = height; }
+
+function spawn() {
+  const it = { t: segs[qi++ % segs.length], r: random(-1, 1), x: 0, y: height + 30, v: random(0.7, 1.6), sel: false, a: 0, hot: false, sz: 20, w: 0 };
+  refit(it); it.x = random(30, max(40, width - PANEL_W - it.w));
+  items.push(it);
+}
+function refit(it) {   // apply the current font, size and size variation to a word that is already on screen
+  const base = +$("fSize").value, v = +$("fVar").value / 100;
+  it.sz = max(10, base * (1 + it.r * v));
+  textFont(curFont); textSize(it.sz); it.w = textWidth(it.t);
+  it.x = min(it.x, max(20, width - 20 - it.w));   // keep resized words inside the screen
+}
+
+// One tick per beat. A drum machine can listen with:  window.addEventListener("beat", e => e.detail.n)
+function fireBeat(beatMs) {
+  if (segs.length) spawn();
+  beatNo++; beatFlash = 1;
+  window.dispatchEvent(new CustomEvent("beat", { detail: { n: beatNo, bpm: +$("bpm").value, ms: beatMs } }));
+}
+function beatClock() {
+  const beatMs = 60000 / +$("bpm").value, now = millis();
+  if (DR.running) {   // while the drums play, their audio clock is the master clock
+    while (DR.beats.length && DR.beats[0] < DR.ctx.currentTime - 0.25) DR.beats.shift();   // drop beats that nobody consumed
+    while (DR.beats.length && DR.beats[0] <= DR.ctx.currentTime) { DR.beats.shift(); fireBeat(beatMs); }
+    nextBeat = 0; return;
+  }
+  if (!nextBeat) nextBeat = now;
+  if (now >= nextBeat) {
+    fireBeat(beatMs);
+    nextBeat += beatMs;
+    if (now - nextBeat > beatMs) nextBeat = now + beatMs;   // catch up after a stalled tab
+  }
+}
+
+function mapPt(p) {   // video coords -> canvas coords (video covers the canvas)
+  const vw = video.elt.videoWidth || 640, vh = video.elt.videoHeight || 480, s = max(width / vw, height / vh);
+  return { x: p.x * s + (width - vw * s) / 2, y: p.y * s + (height - vh * s) / 2 };
+}
+const lp = (a, b) => ({ x: a.x + (b.x - a.x) * SMOOTH, y: a.y + (b.y - a.y) * SMOOTH });
+
+function updateArms() {
+  const k = {}; if (poses.length) poses[0].keypoints.forEach(p => k[p.name] = p);
+  for (const side of ["left", "right"]) {
+    const sh = k[side + "_shoulder"], el = k[side + "_elbow"], wr = k[side + "_wrist"];
+    if (!(el && wr && el.confidence > CONF && wr.confidence > CONF)) {
+      if (++miss[side] > 8) arms[side] = null;   // keep the arm a few frames after tracking drops
+      continue;
+    }
+    miss[side] = 0;
+    const E = mapPt(el), W = mapPt(wr);
+    const tgt = { E, W, T: { x: W.x + (W.x - E.x) * 0.45, y: W.y + (W.y - E.y) * 0.45 },
+                  S: sh && sh.confidence > CONF ? mapPt(sh) : null };
+    const a = arms[side];
+    if (!a) { arms[side] = { ...tgt, pT: { ...tgt.T } }; continue; }
+    a.pT = { x: a.T.x, y: a.T.y };
+    for (const key of ["E", "W", "T"]) a[key] = lp(a[key], tgt[key]);
+    if (tgt.S) a.S = a.S ? lp(a.S, tgt.S) : tgt.S;
+  }
+}
+
+function segRect(x1, y1, x2, y2, rx, ry, rw, rh) {   // segment vs rectangle (Liang-Barsky)
+  let t0 = 0, t1 = 1; const dx = x2 - x1, dy = y2 - y1;
+  const p = [-dx, dx, -dy, dy], q = [x1 - rx, rx + rw - x1, y1 - ry, ry + rh - y1];
+  for (let i = 0; i < 4; i++) {
+    if (p[i] === 0) { if (q[i] < 0) return false; }
+    else {
+      const r = q[i] / p[i];
+      if (p[i] < 0) { if (r > t1) return false; if (r > t0) t0 = r; }
+      else { if (r < t0) return false; if (r < t1) t1 = r; }
+    }
+  }
+  return true;
+}
+
+function getLines() {   // hit lines = arm segments + fingertip sweep path
+  const lines = [], tips = [], vis = [];
+  for (const a of [arms.left, arms.right]) {
+    if (!a) continue;
+    const mine = [];
+    if (a.S) mine.push([a.S, a.E]);
+    mine.push([a.E, a.W], [a.W, a.T]);
+    vis.push(...mine); lines.push(...mine, [a.pT, a.T]); tips.push(a.T);
+  }
+  if (!lines.length && mouseX > (sideOpen() ? 340 : 0)) {   // no camera: mouse acts as the hand
+    lines.push([{ x: pmouseX, y: pmouseY }, { x: mouseX, y: mouseY }]); tips.push({ x: mouseX, y: mouseY });
+  }
+  return { lines, tips, vis };
+}
+
+// ---------- Poem view: a separate browser window that shows the poem (lines rise like credits, or a plain list) ----------
+let pw = null, poemBox = null, tl = [], customFonts = [], lastPH = 0;   // tl = lines currently rising: { el, y }
+const poemOpen = () => !!(pw && !pw.closed && poemBox);
+const tickerMode = () => $("pAuto").checked;
+const lineH = () => Math.round(+$("pSize").value * 1.5);
+const POEM_HTML = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Frog-ism Poem · Poem</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@400;600&family=Noto+Serif+SC&family=Playfair+Display&family=Space+Mono&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:var(--bg,#000);color:var(--fg,#ffffff)}
+  #lines{position:absolute;inset:0 0 156px 0;box-sizing:border-box;padding:0 6vw;text-align:center;overflow-y:auto;scrollbar-width:none;font-family:var(--ff,Georgia,serif);font-size:var(--fs,32px);line-height:var(--lh,48px);-webkit-mask-image:linear-gradient(transparent,#000 12%);mask-image:linear-gradient(transparent,#000 12%)}
+  #lines::-webkit-scrollbar{display:none}
+  #lines div{animation:in .6s}
+  #lines.ticker{overflow:hidden}
+  #lines.ticker div{position:absolute;left:6vw;right:6vw;top:0;height:var(--lh,48px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;will-change:transform}
+  @keyframes in{from{opacity:0}to{opacity:1}}
+  body.hide #lines{bottom:0}
+  #ctl{position:fixed;left:0;right:0;bottom:0;height:156px;box-sizing:border-box;padding:12px 16px;background:rgba(20,20,26,.94);border-top:1px solid #333;color:#bbb;font:12px Inter,Helvetica,Arial,sans-serif;display:grid;gap:6px;align-content:center}
+  body.hide #ctl{display:none}
+  #ctl label{display:flex;align-items:center;gap:8px}
+  #ctl .row{display:flex;align-items:center;gap:16px}
+  #ctl input[type=range]{flex:1}
+  #ctl b{min-width:42px;text-align:right;color:#d4d4d4;font-weight:400}
+  #ctl button,#wToggle{background:none;border:1px solid #888;color:#eee;padding:5px 12px;border-radius:999px;cursor:pointer;font:12px Inter,Helvetica,Arial,sans-serif}
+  #ctl button:hover,#wToggle:hover{background:#eee;color:#111}
+  #wToggle{position:fixed;right:10px;bottom:10px;z-index:3;background:rgba(20,20,26,.9)}
+  body.hide #wToggle{opacity:.35}
+</style></head><body>
+<div id="lines" class="ticker"></div>
+<div id="ctl">
+  <div class="row"><label><input type="checkbox" id="wAuto" checked>Auto-scroll</label><label><input type="checkbox" id="wSync" checked>Sync to tempo</label></div>
+  <label>Speed <input type="range" id="wSpeed" min="0" max="3" step="0.1" value="1"><b id="wSpeedV"></b></label>
+  <label>Size <input type="range" id="wSize" min="16" max="80" value="32"><b id="wSizeV"></b></label>
+  <div class="row"><button id="wSave">Download .txt</button><button id="wClear">Clear</button></div>
+</div>
+<button id="wToggle">Hide controls</button>
+</body></html>`;
+
+function addPopupFont(c, w = pw) { try { const f = new w.FontFace(c.name, c.buf.slice(0)); w.document.fonts.add(f); f.load(); } catch (e) {} }
+function openPoemWindow() {   // must be called from a click, otherwise the browser blocks the pop-up
+  if (poemOpen()) { pw.focus(); return; }
+  pw = window.open("", "armPoemView", "width=460,height=680");
+  if (!pw) { toast("Pop-up blocked. Allow pop-ups for this page, then press Poem view again."); return; }
+  pw.document.open(); pw.document.write(POEM_HTML); pw.document.close();
+  poemBox = pw.document.getElementById("lines");
+  customFonts.forEach(c => addPopupFont(c, pw));
+  const d = pw.document;
+  SYNC.forEach(([w, m, prop]) => d.getElementById(w).addEventListener("input", e => {   // popup control -> sidebar control
+    $(m)[prop] = e.target[prop]; $(m).dispatchEvent(new Event("input"));
+  }));
+  d.getElementById("wSave").onclick = () => savePoem(d);
+  d.getElementById("wClear").onclick = clearPoem;
+  d.getElementById("wToggle").onclick = () => {
+    d.body.classList.toggle("hide");
+    d.getElementById("wToggle").textContent = d.body.classList.contains("hide") ? "⚙ Controls" : "Hide controls";
+    layoutPoem();
+  };
+  popupStyle(); syncPopupControls(); layoutPoem();
+}
+const SYNC = [["wAuto", "pAuto", "checked"], ["wSync", "pSync", "checked"], ["wSpeed", "pSpeed", "value"], ["wSize", "pSize", "value"]];
+function syncPopupControls() {   // sidebar control -> popup control
+  const d = pw.document;
+  SYNC.forEach(([w, m, prop]) => { const el = d.getElementById(w); if (el[prop] !== $(m)[prop]) el[prop] = $(m)[prop]; });
+  d.getElementById("wSpeedV").textContent = $("pSpeedV").textContent;
+  d.getElementById("wSizeV").textContent = $("pSizeV").textContent;
+}
+function popupStyle() {   // keep the window in sync with the settings
+  const r = pw.document.documentElement.style;
+  r.setProperty("--bg", $("cBg").value); r.setProperty("--fg", $("pColor").value); r.setProperty("--ff", curFont);
+  r.setProperty("--fs", $("pSize").value + "px"); r.setProperty("--lh", lineH() + "px");
+}
+function layoutPoem() {   // rebuild the window content, e.g. when switching between ticker and list mode
+  tl = []; if (!poemOpen()) return;
+  const box = poemBox, H = box.clientHeight || 600, LH = lineH(); lastPH = H;
+  box.innerHTML = ""; box.classList.toggle("ticker", tickerMode());
+  const list = tickerMode() ? poem.slice(-(Math.ceil(H / LH) + 1)) : poem;
+  list.forEach((t, i) => {
+    const el = pw.document.createElement("div"); el.textContent = t; box.appendChild(el);
+    if (tickerMode()) { const y = H - LH * (list.length - i); tl.push({ el, y }); el.style.transform = `translateY(${y}px)`; }
+  });
+  if (!tickerMode()) box.scrollTop = box.scrollHeight;
+}
+function addLine(t) {
+  if (!poemOpen()) return;   // not shown, but still part of the poem
+  const el = pw.document.createElement("div"); el.textContent = t; poemBox.appendChild(el);
+  if (tickerMode()) {   // new lines enter at the bottom edge, below the previous line
+    const H = poemBox.clientHeight || 600, LH = lineH(), last = tl[tl.length - 1], y = Math.max(H - LH, last ? last.y + LH : 0);
+    tl.push({ el, y }); el.style.transform = `translateY(${y}px)`;
+  } else poemBox.scrollTop = poemBox.scrollHeight;
+}
+function tickPoem(sec) {
+  if (pw && pw.closed) { pw = null; poemBox = null; tl = []; }
+  const open = poemOpen(), label = open ? "▢ Poem view ✓" : "▢ Poem view";
+  if ($("poemBtn").textContent !== label) { $("poemBtn").textContent = label; $("poemBtn").classList.toggle("attn", !open); }
+  $("poemStat").textContent = open ? "Poem view open." : "Poem view closed. Picked words are still collected.";
+  if (!open) return;
+  popupStyle(); syncPopupControls();
+  const PH = poemBox.clientHeight;   // window resized or controls hidden: keep the rising lines centered
+  if (lastPH && PH !== lastPH) { const d = (PH - lastPH) / 2; tl.forEach(l => { l.y += d; l.el.style.transform = `translateY(${l.y}px)`; }); }
+  lastPH = PH;
+  if (!tickerMode()) return;
+  const px = ($("pSync").checked ? lineH() * (+$("bpm").value / 60) : 40) * +$("pSpeed").value * sec;
+  for (const l of tl) { l.y -= px; l.el.style.transform = `translateY(${l.y}px)`; }
+  while (tl.length && tl[0].y < -lineH()) tl.shift().el.remove();   // gone from view, still in the poem file
+}
+$("pAuto").addEventListener("input", layoutPoem);
+$("pSize").addEventListener("input", layoutPoem);
+$("poemBtn").onclick = $("openPoem").onclick = openPoemWindow;
+addEventListener("beforeunload", () => { [pw, fw].forEach(w => { if (w && !w.closed) w.close(); }); });
+
+// ---------- Frog view: the poem mapped onto the origami frog; every facet scrolls its own lines in its own direction ----------
+let fw = null, fg = null, fScroll = 0;
+const widthCache = new Map(), PLACEHOLDER = ["frog-ism", "feminism"];
+const FROG_HTML = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Frog-ism Poem · Frog view</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@400;600&family=Noto+Serif+SC&family=Playfair+Display&family=Space+Mono&display=swap" rel="stylesheet">
+<style>html,body{margin:0;height:100%;overflow:hidden;background:#000}canvas{display:block;width:100vw;height:100vh}</style></head><body><canvas id="c"></canvas><canvas id="c3" style="display:none"></canvas></body></html>`;
+const frogOpen = () => !!(fw && !fw.closed && fg);
+function openFrogWindow() {   // must be called from a click, otherwise the browser blocks the pop-up
+  if (frogOpen()) { fw.focus(); return; }
+  fw = window.open("", "frogView", "width=720,height=780");
+  if (!fw) { toast("Pop-up blocked. Allow pop-ups for this page, then press Frog view again."); return; }
+  fw.document.open(); fw.document.write(FROG_HTML); fw.document.close();
+  const cv = fw.document.getElementById("c"); fg = cv.getContext("2d");
+  cv.style.cursor = "grab"; cv.style.touchAction = "none";   // drag = turn the 3D frog, double-click = back to auto sway, F = fullscreen
+  cv.onpointerdown = e => {
+    if (!glb) return; cv.setPointerCapture(e.pointerId);
+    const o = { x: e.clientX, y: e.clientY, yaw: glb.holder.rotation.y, pitch: glb.holder.rotation.x };
+    cv.onpointermove = m => { glb.manual = true; glb.yaw = o.yaw + (m.clientX - o.x) * 0.01; glb.pitch = Math.max(-1.4, Math.min(1.4, o.pitch + (m.clientY - o.y) * 0.01)); };
+    cv.onpointerup = () => { cv.onpointermove = null; };
+  };
+  cv.ondblclick = () => { if (glb) glb.manual = false; };
+  fw.addEventListener("keydown", e => { if (e.key.toLowerCase() === "f") { const el = fw.document.documentElement; if (el.requestFullscreen) el.requestFullscreen(); } });
+  customFonts.forEach(c => addPopupFont(c, fw));
+}
+function frogLines(i) {   // which poem lines live on facet i
+  if (!poem.length) return [PLACEHOLDER[i % PLACEHOLDER.length]];
+  const mine = poem.filter((_, j) => j % FROG.facets.length === i).slice(-12);
+  return mine.length ? mine : [poem[i % poem.length]];
+}
+function tickFrog(dt) {
+  if (fw && fw.closed) { fw = null; fg = null; }
+  const open = frogOpen(), label = open ? "🐸 Frog view ✓" : "🐸 Frog view";
+  if ($("frogBtn").textContent !== label) $("frogBtn").textContent = label;
+  $("frogStat").textContent = open ? "Frog view open. Drag to turn the frog, double-click to reset, F = fullscreen." : "Frog view closed.";
+  if (!open) return;
+  const fs = +$("fText").value;
+  fScroll += ($("fSync").checked ? fs * 2 * (+$("bpm").value / 60) : 40) * +$("fSpeed").value * dt / 1000;
+  const cv = fw.document.getElementById("c"), dpr = Math.min(2, fw.devicePixelRatio || 1), W = fw.innerWidth, H = fw.innerHeight;
+  if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+  fg.setTransform(dpr, 0, 0, dpr, 0, 0);
+  if (glb) {
+    try { render3D(cv.width, cv.height, dt, fs); return; }
+    catch (e) { console.error(e); toast("3D view error: " + e.message + " (showing the paper frog)"); glb = null; }
+  }
+  drawFrogView(fg, W, H, fs);
+}
+function drawFrogView(g, W, H, fs) {
+  g.fillStyle = $("cBg").value; g.fillRect(0, 0, W, H);
+  const b = FROG.box, S = Math.min(W / (b.w + 60), H / (b.h + 60));
+  g.save(); g.translate((W - b.w * S) / 2 - b.x * S, (H - b.h * S) / 2 - b.y * S); g.scale(S, S);
+  const paper = $("fPaper").value, ink = $("fInk").value, rgb = hexToRgb(paper), rowH = fs * 1.55, placeholder = !poem.length;
+  g.font = `${fs}px ${curFont}`; g.textBaseline = "middle";
+  FROG.facets.forEach((f, i) => {
+    tracePath(g, f.pts); g.fillStyle = shadeCol(rgb, f.shade); g.fill();
+    const list = frogLines(i);
+    g.save(); g.clip(); g.translate(f.cx, f.cy); g.rotate(f.axis * Math.PI / 180);   // text runs along the facet's own axis
+    g.fillStyle = ink; g.globalAlpha = placeholder ? 0.35 : 0.9;
+    const n = Math.ceil(f.r / rowH);
+    for (let k = -n; k <= n; k++) {
+      const str = list[(((k + i) % list.length) + list.length) % list.length] + "   ·   ", key = g.font + str;
+      let unit = widthCache.get(key);
+      if (!unit) { unit = g.measureText(str).width; if (widthCache.size > 600) widthCache.clear(); widthCache.set(key, unit); }
+      const dir = f.sign * (k % 2 ? -1 : 1);   // neighbouring rows run in opposite directions
+      const off = (((fScroll * dir * (0.8 + 0.15 * (Math.abs(k) % 3))) % unit) + unit) % unit;
+      for (let x = -f.r - unit + off; x < f.r; x += unit) g.fillText(str, x, k * rowH);
+    }
+    g.restore();
+    tracePath(g, f.pts); g.strokeStyle = "rgba(40,40,55,.5)"; g.lineWidth = 1.8; g.lineJoin = "round"; g.stroke();
+  });
+  paintEyes(g, paper, ink, "rgba(40,40,55,.5)", 1.8);
+  g.restore();
+}
+// ---- 3D frog (.glb): the same poem texture is painted onto every mesh of the model ----
+let glb = null, gl3 = null;   // glb = { holder, parts }, gl3 = three.js renderer living in the Frog view window
+$("glbFile").onchange = e => {
+  const f = e.target.files[0]; if (!f) return;
+  f.arrayBuffer().then(buf => new THREE.GLTFLoader().parse(buf, "", gltf => { glb = buildGlb(gltf.scene); $("glbStat").textContent = "3D model: " + f.name; },
+    () => { $("glbStat").textContent = "Could not read that model."; }));
+  e.target.value = "";
+};
+$("glbReset").onclick = () => { glb = defaultGlb; $("glbStat").textContent = glb ? "Using the built-in 3D frog." : "Using the paper frog."; };
+function normalize(root) {   // center the model and scale it to ~2 units
+  const box = new THREE.Box3().setFromObject(root), size = box.getSize(new THREE.Vector3()), c = box.getCenter(new THREE.Vector3());
+  root.position.sub(c);
+  const holder = new THREE.Group(); holder.add(root); holder.scale.setScalar(2 / Math.max(size.x, size.y, size.z, 1e-6));
+  return holder;
+}
+function buildGlb(root) {   // paint-able version of a model for the Frog view
+  const holder = normalize(root), parts = [];
+  root.traverse(o => {
+    if (!o.isMesh) return;
+    const g = o.geometry;
+    if (!g.attributes.uv) {   // no UVs in the file: project the texture from the front
+      const pos = g.attributes.position, uv = new Float32Array(pos.count * 2), b = new THREE.Box3().setFromBufferAttribute(pos);
+      for (let i = 0; i < pos.count; i++) { uv[2 * i] = (pos.getX(i) - b.min.x) / ((b.max.x - b.min.x) || 1); uv[2 * i + 1] = (pos.getY(i) - b.min.y) / ((b.max.y - b.min.y) || 1); }
+      g.setAttribute("uv", new THREE.BufferAttribute(uv, 2));
+    }
+    const cv = document.createElement("canvas"); cv.width = cv.height = 512;
+    const tex = new THREE.CanvasTexture(cv); tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+    o.material = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.9, side: THREE.DoubleSide });
+    const i = parts.length, F = FROG.facets[i % FROG.facets.length];
+    parts.push({ tex, g: cv.getContext("2d"), axis: F.axis, sign: F.sign, i });
+  });
+  // one mesh: cut its texture into 8 cells that scroll different lines in different directions; several meshes: one direction each
+  if (parts.length === 1) parts[0].regions = Array.from({ length: 8 }, (_, r) => ({ x: (r % 2) * 256, y: Math.floor(r / 2) * 128, w: 256, h: 128, i: r, axis: FROG.facets[r].axis, sign: FROG.facets[r].sign }));
+  else parts.forEach(q => { q.regions = [{ x: 0, y: 0, w: 512, h: 512, i: q.i, axis: q.axis, sign: q.sign }]; });
+  return { holder, parts };
+}
+function paintPart(p, fs) {
+  const g = p.g, S = 512, px = fs * 1.7, rowH = px * 1.5, rgb = hexToRgb($("fPaper").value);
+  g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.fillStyle = shadeCol(rgb, 0.96); g.fillRect(0, 0, S, S);
+  g.font = `${px}px ${curFont}`; g.textBaseline = "middle";
+  for (const r of p.regions) {
+    g.save(); g.beginPath(); g.rect(r.x, r.y, r.w, r.h); g.clip();
+    g.translate(r.x + r.w / 2, r.y + r.h / 2); g.rotate(r.axis * Math.PI / 180);
+    g.fillStyle = $("fInk").value; g.globalAlpha = poem.length ? 0.9 : 0.35;
+    const R = Math.hypot(r.w, r.h) / 2, n = Math.ceil(R / rowH), list = frogLines(r.i);
+    for (let k = -n; k <= n; k++) {
+      const str = list[(((k + r.i) % list.length) + list.length) % list.length] + "   ·   ", unit = g.measureText(str).width || 1;
+      const dir = r.sign * (k % 2 ? -1 : 1), off = (((fScroll * 1.7 * dir * (0.8 + 0.15 * (Math.abs(k) % 3))) % unit) + unit) % unit;
+      for (let x = -R - unit + off; x < R; x += unit) g.fillText(str, x, k * rowH);
+    }
+    g.restore();
+    g.strokeStyle = "rgba(40,40,55,.35)"; g.lineWidth = 2; g.strokeRect(r.x, r.y, r.w, r.h);   // crease between cells
+  }
+  p.tex.needsUpdate = true;
+}
+function render3D(PW, PH, dt, fs) {   // drawn off-screen in this page, then copied into the Frog view window's canvas
+  if (PW < 4 || PH < 4) return;
+  if (!gl3) {
+    const cvs = document.createElement("canvas"), renderer = new THREE.WebGLRenderer({ canvas: cvs, antialias: true }), scene = new THREE.Scene();
+    scene.add(new THREE.AmbientLight(0xffffff, 0.8)); const d = new THREE.DirectionalLight(0xffffff, 0.9); d.position.set(2, 3, 4); scene.add(d);
+    const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 50); camera.position.set(0, 0, 5.4); camera.lookAt(0, 0, 0);
+    gl3 = { cvs, renderer, scene, camera, attached: null, rw: 0, rh: 0 };
+  }
+  if (gl3.attached !== glb) { if (gl3.attached) gl3.scene.remove(gl3.attached.holder); gl3.scene.add(glb.holder); gl3.attached = glb; }
+  const k = Math.min(1, 1600 / PW), RW = Math.round(PW * k), RH = Math.round(PH * k);
+  if (gl3.rw !== RW || gl3.rh !== RH) { gl3.renderer.setPixelRatio(1); gl3.renderer.setSize(RW, RH, false); gl3.camera.aspect = RW / RH; gl3.camera.updateProjectionMatrix(); gl3.rw = RW; gl3.rh = RH; }
+  gl3.scene.background = new THREE.Color($("cBg").value);
+  const spin = +$("fSpin").value * dt / 1000;
+  if (glb.manual) glb.holder.rotation.set(glb.pitch || 0, glb.yaw || 0, 0);   // the user turned it with the mouse
+  else if (glb.sway) { glb.phase = (glb.phase || 0) + spin * 1.5; glb.holder.rotation.y = Math.sin(glb.phase) * 0.75; glb.holder.rotation.x = 0; }   // flat model: sway instead of a full turn
+  else glb.holder.rotation.y += spin;
+  glb.parts.forEach(q => paintPart(q, fs));   // the poem scrolls across the texture
+  gl3.renderer.render(gl3.scene, gl3.camera);
+  fg.setTransform(1, 0, 0, 1, 0, 0); fg.drawImage(gl3.cvs, 0, 0, PW, PH);
+}
+
+// ---- built-in frog: frog.glb next to index.html drives the intro page, the border frogs and the Frog view ----
+let defaultGlb = null;
+function use2DFrog() { SPR.draw2D(); SPR.ready = true; $("heroFrog").style.display = "block"; }   // fallback only
+function setupHero(root) {
+  root.traverse(o => { if (o.isMesh) o.material = new THREE.MeshStandardMaterial({ color: 0xf3efe6, roughness: 0.85, flatShading: true, side: THREE.DoubleSide }); });
+  const c = $("heroFrog3"), S = 280, r = new THREE.WebGLRenderer({ canvas: c, antialias: true, alpha: true, preserveDrawingBuffer: true });
+  r.setPixelRatio(2); r.setSize(S, S, false); c.style.width = c.style.height = S + "px";
+  const scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(30, 1, 0.1, 50); cam.position.set(0, 0, 4.6);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.55)); const d = new THREE.DirectionalLight(0xffffff, 1.1); d.position.set(2, 3, 5); scene.add(d);
+  const holder = normalize(root); scene.add(holder);
+  r.render(scene, cam);   // one still frame becomes the little frogs on the border
+  const g = SPR.c.getContext("2d"); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, SPR.c.width, SPR.c.height); g.drawImage(c, 0, 0, SPR.c.width, SPR.c.height);
+  SPR.ready = true; c.style.display = "block";
+  let yaw = 0, pitch = 0, manual = false;   // drag to turn the frog, double-click to let it sway again
+  c.onpointerdown = e => {
+    c.setPointerCapture(e.pointerId); const o = { x: e.clientX, y: e.clientY, yaw: holder.rotation.y, pitch: holder.rotation.x };
+    c.onpointermove = m => { manual = true; yaw = o.yaw + (m.clientX - o.x) * 0.01; pitch = Math.max(-1.4, Math.min(1.4, o.pitch + (m.clientY - o.y) * 0.01)); };
+    c.onpointerup = () => { c.onpointermove = null; };
+  };
+  c.ondblclick = () => { manual = false; };
+  (function sway(t) {
+    requestAnimationFrame(sway); if ($("start").style.display === "none") return;
+    if (manual) holder.rotation.set(pitch, yaw, 0); else { holder.rotation.y = Math.sin(t / 900) * 0.7; holder.rotation.x = 0; }
+    r.render(scene, cam);
+  })(0);
+}
+function loadDefaultFrog() {
+  fetch("frog.glb").then(r => { if (!r.ok) throw new Error("no frog.glb"); return r.arrayBuffer(); })
+    .then(buf => new THREE.GLTFLoader().parse(buf, "", gltf => {
+      try {
+        setupHero(gltf.scene.clone(true));
+        defaultGlb = buildGlb(gltf.scene); defaultGlb.sway = true; if (!glb) glb = defaultGlb;
+        $("glbStat").textContent = "Using the built-in 3D frog.";
+      } catch (e) { console.error(e); toast("3D frog error: " + e.message); if (!SPR.ready) use2DFrog(); }
+    }, e => { console.error(e); if (!SPR.ready) use2DFrog(); }))
+    .catch(() => { if (!SPR.ready) use2DFrog(); });   // frog.glb not found (e.g. page opened as a file)
+}
+$("frogBtn").onclick = $("openFrog").onclick = openFrogWindow;
+
+// ---------- Arm visuals: line, ribbons, trails, particles, constellation ----------
+const newVis = () => ({ arms: { left: null, right: null }, HIST: { left: { E: [], W: [], T: [] }, right: { E: [], W: [], T: [] } }, PARTS: [] });
+const LIVE = newVis(); LIVE.arms = arms;   // the real arms
+const PV = newVis(); let pvT = null;       // the fake arm of the preview in the COLOR panel
+function updateTrails(S, dt) {
+  for (const side of ["left", "right"]) {
+    const a = S.arms[side], h = S.HIST[side];
+    for (const k of ["E", "W", "T"]) { if (a) h[k].push({ x: a[k].x, y: a[k].y }); else h[k].shift(); if (h[k].length > 60) h[k].shift(); }
+  }
+  const inten = +$("armInt").value / 100, P = S.PARTS;
+  if ($("armStyle").value === "particles") for (const side of ["left", "right"]) {
+    const a = S.arms[side]; if (!a) continue;
+    const vx = a.T.x - a.pT.x, vy = a.T.y - a.pT.y;
+    for (let i = 0; i < Math.round(5 * inten); i++) P.push({ x: a.T.x, y: a.T.y, vx: vx * 0.25 + (Math.random() - 0.5) * 3, vy: vy * 0.25 + (Math.random() - 0.5) * 3, life: 1, s: 1 + Math.random() * 2.5 });
+  }
+  for (const p of P) { p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 0.02 * dt; p.vx *= 0.985; p.life -= 0.012 * dt; }
+  for (let i = P.length - 1; i >= 0; i--) if (P[i].life <= 0) P.splice(i, 1);
+  while (P.length > 700) P.shift();
+}
+function paintArms(c, color, vis, tips, S) {   // c = any canvas 2D context: solid color, media-fill mask or the preview
+  const style = $("armStyle").value, lw = +$("wLine").value, inten = +$("armInt").value / 100, A = c.globalAlpha, t = performance.now() / 1000, TAU = 6.2832;
+  c.lineCap = c.lineJoin = "round"; c.strokeStyle = c.fillStyle = color;
+  const seg = (p, q) => { c.beginPath(); c.moveTo(p.x, p.y); c.lineTo(q.x, q.y); c.stroke(); };
+  const dot = (p, r) => { c.beginPath(); c.arc(p.x, p.y, r, 0, TAU); c.fill(); };
+  const smooth = pts => {
+    c.beginPath(); c.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length - 1; i++) c.quadraticCurveTo(pts[i].x, pts[i].y, (pts[i].x + pts[i + 1].x) / 2, (pts[i].y + pts[i + 1].y) / 2);
+    c.lineTo(pts[pts.length - 1].x, pts[pts.length - 1].y); c.stroke();
+  };
+  const base = (alpha, w) => { c.globalAlpha = A * alpha; c.lineWidth = w; vis.forEach(([p, q]) => seg(p, q)); c.globalAlpha = A; tips.forEach(p => dot(p, lw * 1.2)); };
+  if (style === "line") return base(1, lw);
+  if (style === "ribbons") {   // six curves that wave around the arm
+    for (const a of [S.arms.left, S.arms.right]) {
+      if (!a) continue;
+      const pts = [a.S, a.E, a.W, a.T].filter(Boolean), dx = a.T.x - pts[0].x, dy = a.T.y - pts[0].y, L = Math.hypot(dx, dy) || 1, nx = -dy / L, ny = dx / L;
+      for (let i = 0; i < 6; i++) {
+        const amp = lw * 2.2 * inten * (i - 2.5);
+        const off = pts.map((p, j) => { const w = amp * Math.sin(t * 2 + j * 0.9 + i * 0.5); return { x: p.x + nx * w, y: p.y + ny * w }; });
+        c.globalAlpha = A * (0.95 - i * 0.12); c.lineWidth = Math.max(1, lw * (1 - i * 0.12)); smooth(off);
+      }
+    }
+    c.globalAlpha = A; tips.forEach(p => dot(p, lw * 1.1)); return;
+  }
+  if (style === "trails") {   // the path of elbow, wrist and fingertip
+    for (const side of ["left", "right"]) for (const k of ["E", "W", "T"]) {
+      const h = S.HIST[side][k], n = h.length, s0 = Math.max(0, n - Math.max(8, Math.round(60 * inten)));
+      for (let i = s0 + 1; i < n; i++) {
+        const f = (i - s0) / (n - s0);
+        c.globalAlpha = A * f * (k === "T" ? 1 : 0.55); c.lineWidth = Math.max(0.6, lw * f * (k === "T" ? 1.4 : 0.8)); seg(h[i - 1], h[i]);
+      }
+    }
+    return base(0.45, Math.max(1, lw * 0.5));
+  }
+  if (style === "particles") {
+    for (const p of S.PARTS) { c.globalAlpha = A * Math.max(0, p.life); dot(p, p.s * lw / 4 + 0.5); }
+    return base(0.35, Math.max(1, lw * 0.5));
+  }
+  // constellation: joints, lines to recent fingertip positions, and lines between the two arms
+  c.globalAlpha = A * 0.5; c.lineWidth = Math.max(1, lw * 0.35); vis.forEach(([p, q]) => seg(p, q));
+  for (const side of ["left", "right"]) {
+    const a = S.arms[side]; if (!a) continue;
+    const h = S.HIST[side].T;
+    for (let i = 0; i < h.length - 1; i += 3) { c.globalAlpha = A * 0.5 * (i / h.length); seg(a.T, h[i]); dot(h[i], 1.8); }
+    c.globalAlpha = A; [a.S, a.E, a.W, a.T].filter(Boolean).forEach(p => dot(p, lw * 0.8));
+  }
+  if (S.arms.left && S.arms.right) for (const k of ["T", "W", "E"]) { c.globalAlpha = A * 0.4; seg(S.arms.left[k], S.arms.right[k]); }
+  c.globalAlpha = A;
+}
+
+// ---------- Audio tools: four panels (drums, ambience + synths, word-pick sound, voice), all synthesized in the browser ----------
+const DR = { ctx: null, master: null, bus: null, amb: null, pick: null, fx: null, noise: null, running: false, step: 0, next: 0, timer: null, beats: [], log: [], cur: -1 };
+const TRACKS = ["KICK", "SNR", "CLP", "HAT", "OHT", "TOM"];
+const PRESETS = {
+  "Four on the floor": ["x...x...x...x...", "....x.......x...", "", "..x...x...x...x.", "..............x.", ""],
+  "Breakbeat": ["x.....x...x.....", "....x.......x..x", "............x...", "x.x.x.x.x.x.x.x.", "", ""],
+  "Minimal": ["x...............", "........x.......", "", "..x...x...x...x.", "", "..........x....."],
+  "Empty": [],
+};
+const KITS = {   // per track: [volume, pitch in semitones, decay multiplier]
+  "808": [[85, 0, 1], [75, 0, 1], [70, 0, 1], [55, 0, 1], [55, 0, 1], [70, 0, 1]],
+  "Tight": [[85, 3, 0.6], [75, 4, 0.6], [70, 2, 0.7], [55, 3, 0.6], [50, 3, 0.5], [70, 4, 0.6]],
+  "Deep": [[90, -5, 1.5], [70, -4, 1.2], [65, -3, 1.1], [45, -2, 0.8], [45, -2, 1], [75, -5, 1.4]],
+  "Lo-fi": [[80, -2, 0.9], [70, -3, 1.3], [65, -3, 1], [40, -6, 1.4], [40, -6, 1.6], [65, -3, 1]],
+  "Glitch": [[75, 12, 0.35], [70, 9, 0.3], [65, 7, 0.3], [60, 12, 0.25], [50, 12, 0.4], [70, 12, 0.3]],
+};
+let pat = TRACKS.map(() => Array(16).fill(0));
+const mk = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+const rng = (min, max, val, step) => { const i = mk("input"); i.type = "range"; i.min = min; i.max = max; i.value = val; if (step) i.step = step; return i; };
+// controls that are saved in presets (c = checkbox, s = select, v = slider)
+const PID = { drVol: "v", drPitch: "v", ambVol: "v", ambPitch: "v", pkOn: "c", pkInst: "s", pkScale: "s", pkVol: "v", pkPitch: "v", pkFx: "v", pkRev: "v", pkSnap: "c" };
+const VID = { vOn: "c", vSel: "s", vRate: "v", vPitch: "v", vVol: "v", vEcho: "v", vSpace: "s", vDecay: "v", vDrift: "v", vSnap: "c" };
+let saveT;
+function audioChanged() {   // push settings to the audio nodes and remember them for next time
+  setMaster(); showAudioVals(); AMB_KEYS.forEach(([k]) => { if (AMB[k]) ambApply(k); });
+  clearTimeout(saveT); saveT = setTimeout(() => { try { localStorage.setItem("frogAudio", JSON.stringify(audioState())); } catch (e) {} }, 400);
+}
+
+// --- A: drum rows, 16 steps + volume / pitch / decay for every instrument ---
+const dRows = $("drumRows"), trk = [];
+{
+  const h = mk("div", "drow"); h.append(mk("span"), mk("span"));
+  for (let i = 0; i < 16; i++) h.append(mk("span", "dn", i % 4 === 0 ? String(i / 4 + 1) : ""));
+  ["VOL", "PITCH", "DECAY"].forEach(x => h.append(mk("span", "dl", x))); dRows.append(h);
+}
+TRACKS.forEach((lab, t) => {
+  const row = mk("div", "drow"), x = { muted: false };
+  row.append(mk("span", "dl", lab));
+  x.mute = mk("button", "mbtn", "M"); x.mute.onclick = () => { x.muted = !x.muted; x.mute.classList.toggle("on", x.muted); audioChanged(); }; row.append(x.mute);
+  for (let st = 0; st < 16; st++) {
+    const c = mk("i", "stp" + (st % 4 === 0 ? " b" : "")); c.dataset.t = t; c.dataset.s = st;
+    c.onclick = () => { pat[t][st] ^= 1; c.classList.toggle("on", !!pat[t][st]); if (pat[t][st]) { audioInit(); drumHit(t, DR.ctx.currentTime); } audioChanged(); };
+    row.append(c);
+  }
+  x.vol = rng(0, 100, 80); x.pitch = rng(-12, 12, 0); x.decay = rng(0.3, 2.5, 1, 0.05);
+  [x.vol, x.pitch, x.decay].forEach(i => { i.oninput = audioChanged; row.append(i); });
+  trk.push(x); dRows.append(row);
+});
+function refreshGrid() { dRows.querySelectorAll(".stp").forEach(c => c.classList.toggle("on", !!pat[+c.dataset.t][+c.dataset.s])); }
+function loadPreset(name) {
+  const P = PRESETS[name] || [];
+  pat = TRACKS.map((_, t) => Array.from({ length: 16 }, (_, st) => (P[t] || "")[st] === "x" ? 1 : 0)); refreshGrid(); audioChanged();
+}
+function loadKit(name) { (KITS[name] || []).forEach(([v, p, d], t) => { trk[t].vol.value = v; trk[t].pitch.value = p; trk[t].decay.value = d; }); audioChanged(); }
+$("drumPreset").addEventListener("input", e => loadPreset(e.target.value));
+$("kitSel").addEventListener("input", e => loadKit(e.target.value));
+$("drumClear").onclick = () => { pat = TRACKS.map(() => Array(16).fill(0)); refreshGrid(); audioChanged(); };
+
+// --- B: ambience textures + synth layers ---
+const AMB_KEYS = [["wind", "Wind"], ["rain", "Rain"], ["crackle", "Crackle"], ["drone", "Drone"], ["pad", "Warm pad"], ["glass", "Glass"], ["arp", "Arp"]], ambUI = {}, AMB = {};
+let noiseBuf3 = null, crackleBuf = null;
+AMB_KEYS.forEach(([k, lab]) => {
+  const row = mk("div", "arow"), u = { on: false };
+  row.append(mk("span", "dl", lab.toUpperCase()));
+  u.btn = mk("button", "tg", "ON"); u.btn.onclick = () => { u.on = !u.on; u.btn.classList.toggle("on", u.on); ambApply(k); audioChanged(); };
+  u.vol = rng(0, 100, 50); u.tone = rng(0, 100, 50);
+  [u.vol, u.tone].forEach(i => i.oninput = () => { ambApply(k); audioChanged(); });
+  row.append(u.btn, u.vol, u.tone); ambUI[k] = u; $("ambRows").append(row);
+});
+function ambBuffers(c) {
+  if (noiseBuf3) return;
+  noiseBuf3 = c.createBuffer(1, c.sampleRate * 3, c.sampleRate); const d = noiseBuf3.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  crackleBuf = c.createBuffer(1, c.sampleRate * 4, c.sampleRate); const q = crackleBuf.getChannelData(0);
+  for (let i = 0; i < q.length; i++) if (Math.random() < 0.0004) { const a = 0.2 + Math.random() * 0.8; for (let j = 0; j < 30 && i + j < q.length; j++) q[i + j] = (Math.random() * 2 - 1) * a * Math.exp(-j / 6); }
+}
+const loopSrc = (c, buf) => { const s = c.createBufferSource(); s.buffer = buf; s.loop = true; return s; };
+const semi = p => Math.pow(2, p / 12);
+// one oscillator note with an exponential envelope; returns the oscillator
+function note(c, w, type, f, a, atk, dec, out, f2) {
+  const o = c.createOscillator(), g = c.createGain(); o.type = type; o.frequency.setValueAtTime(f, w); if (f2) o.frequency.exponentialRampToValueAtTime(f2, w + dec);
+  g.gain.setValueAtTime(0.0001, w); g.gain.exponentialRampToValueAtTime(a, w + atk); g.gain.exponentialRampToValueAtTime(0.0001, w + dec);
+  o.connect(g); g.connect(out); o.start(w); o.stop(w + dec + 0.05); return o;
+}
+const AMB_MAKE = {   // every layer returns { set(tone 0..1), pitch(semitones), stop() }
+  wind(c, out) {
+    const n = loopSrc(c, noiseBuf3), f = c.createBiquadFilter(), l = c.createOscillator(), lg = c.createGain();
+    f.type = "bandpass"; f.Q.value = 0.7; l.frequency.value = 0.12; lg.gain.value = 250; l.connect(lg); lg.connect(f.frequency);
+    n.connect(f); f.connect(out); n.start(); l.start();
+    return { set: v => { f.frequency.value = 250 + v * 1000; }, pitch: p => { n.playbackRate.value = semi(p); }, stop: () => { n.stop(); l.stop(); } };
+  },
+  rain(c, out) {
+    const n = loopSrc(c, noiseBuf3), f = c.createBiquadFilter(); f.type = "highpass"; n.connect(f); f.connect(out); n.start();
+    return { set: v => { f.frequency.value = 1200 + v * 4000; }, pitch: p => { n.playbackRate.value = semi(p); }, stop: () => n.stop() };
+  },
+  crackle(c, out) {
+    const n = loopSrc(c, crackleBuf), f = c.createBiquadFilter(); f.type = "highpass"; n.connect(f); f.connect(out); n.start();
+    return { set: v => { f.frequency.value = 300 + v * 6000; }, pitch: p => { n.playbackRate.value = semi(p); }, stop: () => n.stop() };
+  },
+  drone(c, out) {
+    const f = c.createBiquadFilter(), l = c.createOscillator(), lg = c.createGain();
+    const oscs = [55, 55.3, 82.5, 110.2].map(fr => { const o = c.createOscillator(); o.type = "sawtooth"; o.frequency.value = fr; o.connect(f); o.start(); return o; });
+    f.type = "lowpass"; l.frequency.value = 0.07; lg.gain.value = 120; l.connect(lg); lg.connect(f.frequency); f.connect(out); l.start();
+    return { set: v => { f.frequency.value = 150 + v * 1500; }, pitch: p => oscs.forEach(o => { o.detune.value = p * 100; }), stop: () => { oscs.forEach(o => o.stop()); l.stop(); } };
+  },
+  pad(c, out) {   // detuned saw chord through a slowly moving low-pass
+    const f = c.createBiquadFilter(), pg = c.createGain(), l = c.createOscillator(), lg = c.createGain();
+    const oscs = [0, 4, 7, 12].flatMap(st => [-7, 7].map(dt => { const o = c.createOscillator(); o.type = "sawtooth"; o.frequency.value = 110 * semi(st); o.detune.value = dt; o.connect(f); o.start(); return o; }));
+    f.type = "lowpass"; f.Q.value = 2; pg.gain.value = 0.12; l.frequency.value = 0.09; lg.gain.value = 400; l.connect(lg); lg.connect(f.frequency); f.connect(pg); pg.connect(out); l.start();
+    return { set: v => { f.frequency.value = 300 + v * 2500; }, pitch: p => oscs.forEach((o, i) => { o.detune.value = (i % 2 ? 7 : -7) + p * 100; }), stop: () => { oscs.forEach(o => o.stop()); l.stop(); } };
+  },
+  glass(c, out) {   // bright sine/triangle chord with tremolo
+    const g = c.createGain(), t = c.createOscillator(), tg = c.createGain(); g.gain.value = 0.25; t.frequency.value = 4.5; tg.gain.value = 0.12; t.connect(tg); tg.connect(g.gain);
+    const oscs = [0, 7, 12, 16].map((st, i) => { const o = c.createOscillator(); o.type = i % 2 ? "triangle" : "sine"; o.frequency.value = 523.25 * semi(st); o.connect(g); o.start(); return o; });
+    g.connect(out); t.start();
+    return { set: v => { t.frequency.value = 0.5 + v * 9; }, pitch: p => oscs.forEach(o => { o.detune.value = p * 100; }), stop: () => { oscs.forEach(o => o.stop()); t.stop(); } };
+  },
+  arp(c, out) {   // random plucks on a scale, one every eighth note of the tempo
+    let next = c.currentTime + 0.1, tone = 0.5, tr = 0;
+    const scale = [0, 2, 4, 7, 9, 12, 14, 16], timer = setInterval(() => {
+      const spb = 60 / +$("bpm").value;
+      while (next < c.currentTime + 0.15) { const f = 220 * semi(scale[Math.floor(Math.random() * (3 + tone * 5))] + tr); note(c, next, "triangle", f, 0.5, 0.004, 0.5, out); next += spb / 2; }
+    }, 30);
+    return { set: v => { tone = v; }, pitch: p => { tr = p; }, stop: () => clearInterval(timer) };
+  },
+};
+function ambApply(k) {
+  const u = ambUI[k];
+  if (u.on && !AMB[k]) {
+    audioInit(); ambBuffers(DR.ctx);
+    const g = DR.ctx.createGain(); g.connect(DR.amb); AMB[k] = { g, ...AMB_MAKE[k](DR.ctx, g) };
+  }
+  if (!u.on && AMB[k]) { AMB[k].stop(); AMB[k].g.disconnect(); delete AMB[k]; }
+  if (AMB[k]) { AMB[k].g.gain.value = u.vol.value / 100 * 0.5; AMB[k].set(u.tone.value / 100); AMB[k].pitch(+$("ambPitch").value); }
+}
+
+// --- audio engine: one bus per panel, then master -> compressor -> speakers ---
+function audioInit() {   // browsers only allow audio after a click, so this is also called from every click
+  if (DR.ctx) { if (DR.ctx.state === "suspended") DR.ctx.resume(); return; }
+  const c = DR.ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const comp = c.createDynamicsCompressor(); comp.connect(c.destination);
+  DR.master = c.createGain(); DR.master.connect(comp);
+  DR.bus = c.createGain(); DR.bus.connect(DR.master); DR.amb = c.createGain(); DR.amb.connect(DR.master);
+  DR.noise = c.createBuffer(1, c.sampleRate, c.sampleRate);
+  const d = DR.noise.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  // effects send for the word-pick sound: tempo-synced feedback delay + generated reverb
+  const fxIn = c.createGain(), delay = c.createDelay(2), fb = c.createGain(), dlp = c.createBiquadFilter(), dOut = c.createGain(), conv = c.createConvolver(), rOut = c.createGain();
+  dlp.type = "lowpass"; dlp.frequency.value = 3500; fb.gain.value = 0.45;
+  fxIn.connect(delay); delay.connect(dlp); dlp.connect(fb); fb.connect(delay); dlp.connect(dOut); dOut.connect(DR.master);
+  const len = c.sampleRate * 2, ir = c.createBuffer(2, len, c.sampleRate);
+  for (let ch = 0; ch < 2; ch++) { const x = ir.getChannelData(ch); for (let i = 0; i < len; i++) x[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.5); }
+  conv.buffer = ir; fxIn.connect(conv); conv.connect(rOut); rOut.connect(DR.master);
+  DR.fx = { in: fxIn, delay, fb, dly: dOut, rev: rOut };
+  DR.pick = c.createGain(); DR.pick.connect(DR.master); DR.pick.connect(fxIn);
+  setMaster(); AMB_KEYS.forEach(([k]) => ambApply(k));   // start layers that were switched on before the first click
+}
+function setMaster() {
+  if (!DR.master) return;
+  DR.master.gain.value = $("aVol").value / 100 * 0.9; DR.bus.gain.value = $("drVol").value / 100;
+  DR.amb.gain.value = $("ambVol").value / 100; DR.pick.gain.value = $("pkVol").value / 100;
+}
+function showAudioVals() {
+  $("aVolV").textContent = $("aVol").value + "%"; $("bpmAV").textContent = $("bpm").value;
+  document.querySelectorAll(".pbar input[type=range]").forEach(i => {
+    const b = $(i.id + "V"); if (!b) return;
+    b.textContent = i.id === "vPitch" ? (+i.value).toFixed(2) : /Pitch$/.test(i.id) ? (i.value > 0 ? "+" : "") + i.value + " st" : i.value + "%";
+  });
+}
+addEventListener("pointerdown", () => audioInit());
+
+function drumHit(t, w) {   // t = track, w = audio time
+  const x = trk[t]; if (x.muted) return;
+  const c = DR.ctx, out = DR.bus, V = x.vol.value / 100, P = semi(+x.pitch.value + +$("drPitch").value), D = +x.decay.value;
+  const osc = (type, f0, f1, d, a) => {
+    d *= D; const o = c.createOscillator(), g = c.createGain(); o.type = type;
+    o.frequency.setValueAtTime(f0 * P, w); o.frequency.exponentialRampToValueAtTime(f1 * P, w + d);
+    g.gain.setValueAtTime(0.0001, w); g.gain.exponentialRampToValueAtTime(a * V, w + 0.003); g.gain.exponentialRampToValueAtTime(0.0001, w + d);
+    o.connect(g); g.connect(out); o.start(w); o.stop(w + d + 0.02);
+  };
+  const noise = (type, f, q, d, a, bursts = [0]) => bursts.forEach(b => {
+    d *= D; const n = c.createBufferSource(), flt = c.createBiquadFilter(), g = c.createGain();
+    n.buffer = DR.noise; flt.type = type; flt.frequency.value = Math.min(f * P, 16000); flt.Q.value = q;
+    g.gain.setValueAtTime(0.0001, w + b); g.gain.exponentialRampToValueAtTime(a * V, w + b + 0.003); g.gain.exponentialRampToValueAtTime(0.0001, w + b + d);
+    n.connect(flt); flt.connect(g); g.connect(out); n.start(w + b, Math.random() * 0.5); n.stop(w + b + d + 0.02);
+  });
+  switch (t) {
+    case 0: osc("sine", 160, 42, 0.38, 1); break;                                                  // kick
+    case 1: noise("highpass", 1500, 0.7, 0.18, 0.7); osc("triangle", 220, 120, 0.1, 0.5); break;   // snare
+    case 2: noise("bandpass", 1800, 1.2, 0.09, 0.8, [0, 0.012, 0.024]); break;                      // clap
+    case 3: noise("highpass", 7500, 0.7, 0.045, 0.35); break;                                       // closed hat
+    case 4: noise("highpass", 7000, 0.7, 0.32, 0.35); break;                                        // open hat
+    default: osc("sine", 220, 110, 0.22, 0.8);                                                      // tom
+  }
+}
+function drumSchedule() {   // look-ahead scheduler: sounds are placed on the audio clock a little before they play
+  const spb = 60 / +$("bpm").value;
+  while (DR.next < DR.ctx.currentTime + 0.12) {
+    const st = DR.step % 16;
+    if (DR.step % 4 === 0) { DR.beats.push(DR.next); if (DR.beats.length > 64) DR.beats.shift(); }
+    pat.forEach((row, t) => { if (row[st]) drumHit(t, DR.next); });
+    DR.log.push([st, DR.next]); if (DR.log.length > 64) DR.log.shift();
+    DR.next += spb / 4; DR.step++;
+  }
+}
+function drumToggle() {
+  if (DR.running) { clearInterval(DR.timer); DR.running = false; DR.beats = []; DR.log = []; nextBeat = 0; }
+  else { audioInit(); DR.running = true; DR.step = 0; DR.beats = []; DR.log = []; DR.next = DR.ctx.currentTime + 0.08; drumSchedule(); DR.timer = setInterval(drumSchedule, 25); }
+  $("drumOn").checked = DR.running;
+}
+$("drumOn").onchange = () => { if ($("drumOn").checked !== DR.running) drumToggle(); };
+$("audioBtn").onclick = () => document.body.classList.toggle("audio-open");
+$("aClose").onclick = () => document.body.classList.remove("audio-open");
+function tickDrum() {
+  if (!DR.running) { if (DR.cur !== -1) setCurStep(-1); return; }
+  while (DR.log.length && DR.log[0][1] <= DR.ctx.currentTime) setCurStep(DR.log.shift()[0]);
+}
+function setCurStep(st) { DR.cur = st; dRows.querySelectorAll(".stp").forEach(c => c.classList.toggle("cur", +c.dataset.s === st)); }
+
+// --- tempo shortcut in the audio bar (same value as the Tempo slider in the visual settings) ---
+$("bpmA").value = $("bpm").value;
+$("bpm").addEventListener("input", () => { $("bpmA").value = $("bpm").value; showAudioVals(); });
+$("bpmA").addEventListener("input", () => { $("bpm").value = $("bpmA").value; $("bpm").dispatchEvent(new Event("input")); });
+["aVol", ...Object.keys(PID), ...Object.keys(VID)].forEach(id => $(id).addEventListener("input", audioChanged));
+
+// --- C: the sound of a picked word ---
+const PICK_SCALES = { "Pentatonic": [0, 2, 4, 7, 9], "Major": [0, 2, 4, 5, 7, 9, 11], "Minor": [0, 2, 3, 5, 7, 8, 10], "Whole tone": [0, 2, 4, 6, 8, 10], "Chromatic": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] };
+const PICK = {   // instrument(c, audioTime, frequency, outputNode)
+  "Pluck": (c, w, f, out) => { note(c, w, "sine", f, 0.5, 0.005, 0.5, out); note(c, w, "triangle", f * 2, 0.15, 0.005, 0.35, out); },
+  "Bell": (c, w, f, out) => {   // two-operator FM: a fast-decaying modulator makes the bright attack
+    const car = c.createOscillator(), mod = c.createOscillator(), mg = c.createGain(), g = c.createGain();
+    car.frequency.value = f; mod.frequency.value = f * 3.5; mg.gain.setValueAtTime(f * 2, w); mg.gain.exponentialRampToValueAtTime(1, w + 1.2); mod.connect(mg); mg.connect(car.frequency);
+    g.gain.setValueAtTime(0.0001, w); g.gain.exponentialRampToValueAtTime(0.4, w + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, w + 1.4);
+    car.connect(g); g.connect(out); car.start(w); mod.start(w); car.stop(w + 1.5); mod.stop(w + 1.5);
+  },
+  "Marimba": (c, w, f, out) => { note(c, w, "sine", f, 0.6, 0.003, 0.3, out); note(c, w, "sine", f * 4, 0.2, 0.002, 0.07, out); },
+  "Glass pad": (c, w, f, out) => { [-6, 6].forEach(d => { note(c, w, "triangle", f, 0.22, 0.15, 1.1, out).detune.value = d; }); },
+  "Croak": (c, w, f, out) => {   // sawtooth with a fast tremolo through a low-pass: a small frog
+    const o = c.createOscillator(), lp = c.createBiquadFilter(), g = c.createGain(), l = c.createOscillator(), lg = c.createGain();
+    o.type = "sawtooth"; o.frequency.setValueAtTime(f / 2, w); o.frequency.exponentialRampToValueAtTime(f / 2.6, w + 0.3);
+    lp.type = "lowpass"; lp.frequency.value = 650; l.frequency.value = 26; lg.gain.value = 0.3;
+    g.gain.setValueAtTime(0.0001, w); g.gain.exponentialRampToValueAtTime(0.45, w + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, w + 0.32);
+    l.connect(lg); lg.connect(g.gain); o.connect(lp); lp.connect(g); g.connect(out); o.start(w); l.start(w); o.stop(w + 0.35); l.stop(w + 0.35);
+  },
+  "Blip": (c, w, f, out) => { note(c, w, "square", f * 2, 0.12, 0.002, 0.09, out, f * 0.8); },
+  "Click": (c, w, f, out) => {
+    const n = c.createBufferSource(), hp = c.createBiquadFilter(), g = c.createGain(); n.buffer = DR.noise; hp.type = "highpass"; hp.frequency.value = 2500;
+    g.gain.setValueAtTime(0.5, w); g.gain.exponentialRampToValueAtTime(0.0001, w + 0.04); n.connect(hp); hp.connect(g); g.connect(out); n.start(w, Math.random() * 0.5); n.stop(w + 0.06);
+    note(c, w, "sine", f * 2, 0.2, 0.002, 0.05, out);
+  },
+};
+const snapDelay = () => DR.running ? Math.max(0, DR.next - DR.ctx.currentTime) : 0;   // seconds until the next 16th step
+function playPick(word, w) {
+  const c = DR.ctx; let h = 0; for (const ch of word) h += ch.charCodeAt(0);
+  const sc = PICK_SCALES[$("pkScale").value] || PICK_SCALES.Pentatonic, deg = sc[h % sc.length] + 12 * (Math.floor(h / sc.length) % 2);
+  DR.fx.delay.delayTime.value = Math.min(1.9, 60 / +$("bpm").value * 0.75);   // dotted eighth of the tempo
+  DR.fx.dly.gain.value = $("pkFx").value / 100; DR.fx.rev.gain.value = $("pkRev").value / 100;
+  (PICK[$("pkInst").value] || PICK.Pluck)(c, w, 261.63 * semi(deg + +$("pkPitch").value), DR.pick);
+}
+function pickSound(word) {
+  speakWord(word);
+  if (!$("pkOn").checked || !DR.ctx || DR.ctx.state !== "running") return;
+  playPick(word, DR.ctx.currentTime + ($("pkSnap").checked ? snapDelay() : 0.005));
+}
+$("pkTest").onclick = () => { audioInit(); if (DR.ctx.state === "running") playPick("frog", DR.ctx.currentTime + 0.02); };
+
+// --- D: voice, speak the touched word with tempo-timed echoes ---
+let voices = [], ttsBusy = 0;
+function loadVoices() {
+  if (!window.speechSynthesis) return;
+  voices = speechSynthesis.getVoices(); const cur = $("vSel").value; $("vSel").innerHTML = "";
+  voices.forEach(v => { const o = mk("option", "", v.name + " (" + v.lang + ")"); o.value = v.name; $("vSel").append(o); });
+  if (cur) $("vSel").value = cur; if ($("vSel").selectedIndex < 0) $("vSel").selectedIndex = 0;
+}
+if (window.speechSynthesis) { speechSynthesis.onvoiceschanged = loadVoices; loadVoices(); }
+function speakWord(word) {
+  if (!$("vOn").checked || !window.speechSynthesis) return;
+  const spb = 60 / +$("bpm").value, space = { "1/16": 0.25, "1/8": 0.5, "3/16": 0.75, "1/4": 1 }[$("vSpace").value] * spb;
+  const base = $("vSnap").checked ? snapDelay() : 0, reps = +$("vEcho").value, dec = $("vDecay").value / 100, drift = semi(+$("vDrift").value);
+  const voice = voices.find(v => v.name === $("vSel").value);
+  for (let k = 0; k <= reps; k++) setTimeout(() => {
+    if (ttsBusy > 8) return;
+    const u = new SpeechSynthesisUtterance(word); if (voice) u.voice = voice;
+    u.rate = +$("vRate").value; u.pitch = Math.min(2, Math.max(0, +$("vPitch").value * Math.pow(drift, k))); u.volume = Math.min(1, $("vVol").value / 100 * Math.pow(dec, k));
+    ttsBusy++; u.onend = u.onerror = () => { ttsBusy--; }; speechSynthesis.speak(u);
+  }, (base + k * space) * 1000);
+}
+
+// --- presets: everything above as a .json file, and remembered automatically for next time ---
+function readIds(map) { const o = {}; Object.entries(map).forEach(([id, k]) => { o[id] = k === "c" ? $(id).checked : $(id).value; }); return o; }
+function writeIds(map, o) { Object.entries(map).forEach(([id, k]) => { const v = (o || {})[id]; if (v === undefined) return; if (k === "c") $(id).checked = !!v; else $(id).value = v; }); }
+function audioState() {
+  const ambience = {}; AMB_KEYS.forEach(([k]) => { ambience[k] = { on: ambUI[k].on, vol: +ambUI[k].vol.value, tone: +ambUI[k].tone.value }; });
+  return { app: "frog-ism-poem", type: "audio-preset", version: 2, bpm: +$("bpm").value, master: +$("aVol").value, kit: $("kitSel").value,
+    pattern: pat.map(r => r.join("")), tracks: trk.map(x => ({ vol: +x.vol.value, pitch: +x.pitch.value, decay: +x.decay.value, mute: x.muted })),
+    ambience, panels: readIds(PID), voice: readIds(VID) };
+}
+function applyAudioState(o) {
+  if (o.bpm) { $("bpm").value = o.bpm; $("bpm").dispatchEvent(new Event("input")); }
+  if (o.master != null) $("aVol").value = o.master;
+  if (o.kit && KITS[o.kit]) $("kitSel").value = o.kit;
+  if (Array.isArray(o.pattern)) { pat = TRACKS.map((_, t) => Array.from({ length: 16 }, (_, st) => (o.pattern[t] || "")[st] === "1" ? 1 : 0)); refreshGrid(); }
+  (o.tracks || []).forEach((v, t) => { const x = trk[t]; if (!x) return; x.vol.value = v.vol; x.pitch.value = v.pitch; x.decay.value = v.decay; x.muted = !!v.mute; x.mute.classList.toggle("on", x.muted); });
+  AMB_KEYS.forEach(([k]) => { const v = (o.ambience || {})[k]; if (!v) return; const u = ambUI[k]; u.vol.value = v.vol; u.tone.value = v.tone; u.on = !!v.on; u.btn.classList.toggle("on", u.on); });
+  writeIds(PID, o.panels); writeIds(VID, o.voice);
+  if ($("vSel").selectedIndex < 0) $("vSel").selectedIndex = 0;
+  setMaster(); showAudioVals(); if (DR.ctx) AMB_KEYS.forEach(([k]) => ambApply(k));
+}
+$("aSave").onclick = () => {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(audioState(), null, 2)], { type: "application/json" }));
+  a.download = "frog-audio-preset.json"; a.click();
+};
+$("aLoad").onchange = e => {
+  const f = e.target.files[0]; if (!f) return; audioInit();
+  f.text().then(t => { const o = JSON.parse(t); if (o.type !== "audio-preset") throw new Error("this is not an audio preset"); applyAudioState(o); audioChanged(); toast("Audio preset loaded: " + f.name); })
+    .catch(err => toast("Could not load the preset: " + err.message));
+  e.target.value = "";
+};
+loadPreset("Four on the floor"); showAudioVals();
+try { const saved = JSON.parse(localStorage.getItem("frogAudio") || "null"); if (saved && saved.type === "audio-preset") applyAudioState(saved); } catch (e) {}
+
+function draw() {
+  background(col("cBg"));
+  tickPoem(deltaTime / 1000);   // keeps the poem view up to date even before a text is loaded
+  tickFrog(deltaTime);
+  tickDrum();
+  if (!running) return;
+  updateArms();
+  const dt = min(deltaTime / 16.67, 3), spd = +$("speed").value;   // frame-rate independent motion
+
+  // layer 1: webcam (opacity 0 = fully dark scene)
+  const camA = +$("camOp").value / 100, cam = srcEl("webcam");
+  if (cam && camA > 0) { const c = drawingContext; c.save(); c.globalAlpha = camA; drawCover(c, cam, width, height, true); c.restore(); }
+
+  // layer 2: overlay (webcam / image / video) with blend mode
+  const ovKind = $("ovSrc").value, ovA = +$("ovOp").value / 100, ovEl = srcEl(ovKind);
+  if (ovEl && ovA > 0) {
+    const c = drawingContext; c.save(); c.globalAlpha = ovA; c.globalCompositeOperation = $("ovBlend").value;
+    drawCover(c, ovEl, width, height, ovKind === "webcam"); c.restore();
+  }
+
+  beatClock();
+  beatFlash = max(0, beatFlash - dt * 0.08);
+  $("beatDot").style.opacity = 0.2 + 0.8 * beatFlash;
+  const { lines, tips, vis } = getLines(), pad = 10;
+
+  // arm line vs word intersection
+  let best = null, bestD = 1e9;
+  for (const it of items) {
+    it.hot = false; if (it.sel) continue;
+    it.y -= it.v * spd * dt;
+    refit(it);
+    const rx = it.x - pad, ry = it.y - it.sz / 2 - pad, rw = it.w + pad * 2, rh = it.sz + pad * 2;
+    for (const [p, q] of lines) if (segRect(p.x, p.y, q.x, q.y, rx, ry, rw, rh)) { it.hot = true; break; }
+    if (it.hot) {
+      const cx = it.x + it.w / 2, cy = it.y;
+      for (const t of tips) { const d = dist(cx, cy, t.x, t.y); if (d < bestD) { bestD = d; best = it; } }
+      if (!tips.length) best = best || it;
+    }
+  }
+  if (best && millis() - lastPick > +$("cool").value) { best.sel = true; pick(best.t); lastPick = millis(); }
+
+  // layer 3: words
+  noStroke();
+  for (const it of items) {
+    textFont(curFont);
+    if (it.sel) {
+      it.a += dt; it.y -= 0.5 * dt; textSize(it.sz * (1 + it.a * 0.01));
+      fill(col("cSel", 255 - it.a * 5));
+    } else {
+      textSize(it.sz);
+      fill(it.hot ? col("cLine", 255) : col("cText", 210));
+    }
+    text(it.t, it.x, it.y);
+  }
+  items = items.filter(i => i.y > -80 && i.a < 50);
+
+  // layer 4 (top): the arm visual, solid color or filled with webcam / image / video
+  updateTrails(LIVE, dt);
+  const la = +$("lineOp").value / 100, lineSrc = $("lineFill").value, fillEl = lineSrc === "solid" ? null : srcEl(lineSrc);
+  if (la > 0) {
+    if (!fillEl) { const d = drawingContext; d.save(); d.globalAlpha = la; paintArms(d, $("cLine").value, vis, tips, LIVE); d.restore(); }
+    else {   // draw the visual as a white mask, then let the media show through it
+      const c = lineCtx; c.clearRect(0, 0, width, height); c.globalCompositeOperation = "source-over"; c.globalAlpha = 1;
+      paintArms(c, "#fff", vis, tips, LIVE);
+      c.globalCompositeOperation = "source-in"; drawCover(c, fillEl, width, height, lineSrc === "webcam"); c.globalCompositeOperation = "source-over";
+      const d = drawingContext; d.save(); d.globalAlpha = la; d.drawImage(lineLayer, 0, 0, width, height); d.restore();
+    }
+  }
+}
+
+// ---------- Poem ----------
+function pick(t) { poem.push(t); addLine(t); pickSound(t); }
+function clearPoem() { poem = []; layoutPoem(); }
+function savePoem(doc = document) {   // doc = the window the click came from
+  const a = doc.createElement("a");
+  a.href = URL.createObjectURL(new Blob([poem.join("\n")], { type: "text/plain" }));
+  a.download = "poem.txt"; a.click();
+}
+$("clear").onclick = clearPoem; $("save").onclick = () => savePoem();
+loadDefaultFrog();
+</script>
+</body>
+</html>
