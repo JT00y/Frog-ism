@@ -1,0 +1,673 @@
+{
+  "app": "frog-ism-poem",
+  "type": "timeline",
+  "version": 2,
+  "len": 90,
+  "keys": {
+    "layers": [
+      {
+        "t": 0,
+        "s": {
+          "v": {
+            "camOp": "0",
+            "ovSrc": "none",
+            "ovOp": "40",
+            "ovBlend": "source-over",
+            "lineOp": "100",
+            "lineFill": "webcam"
+          },
+          "x": {}
+        }
+      },
+      {
+        "t": 21.1,
+        "s": {
+          "v": {
+            "camOp": "9",
+            "ovSrc": "none",
+            "ovOp": "40",
+            "ovBlend": "source-over",
+            "lineOp": "100",
+            "lineFill": "webcam"
+          },
+          "x": {}
+        }
+      },
+      {
+        "t": 58.104395604395606,
+        "s": {
+          "v": {
+            "camOp": "21",
+            "ovSrc": "none",
+            "ovOp": "33",
+            "ovBlend": "source-over",
+            "lineOp": "100",
+            "lineFill": "solid"
+          },
+          "x": {}
+        }
+      }
+    ],
+    "armvis": [
+      {
+        "t": 0,
+        "s": {
+          "v": {
+            "armStyle": "trails",
+            "armInt": "200",
+            "ribN": "6",
+            "trLen": "60",
+            "ptSize": "4",
+            "ptCount": "6",
+            "ptLife": "1.4",
+            "ptSpread": "3",
+            "ptGrav": "0.2",
+            "webN": "3"
+          },
+          "x": {}
+        }
+      },
+      {
+        "t": 21.4,
+        "s": {
+          "v": {
+            "armStyle": "particles",
+            "armInt": "111",
+            "ribN": "6",
+            "trLen": "60",
+            "ptSize": "4",
+            "ptCount": "5",
+            "ptLife": "1.4",
+            "ptSpread": "3",
+            "ptGrav": "0.2",
+            "webN": "3"
+          },
+          "x": {}
+        }
+      },
+      {
+        "t": 58.104395604395606,
+        "s": {
+          "v": {
+            "armStyle": "particles",
+            "armInt": "115",
+            "ribN": "6",
+            "trLen": "60",
+            "ptSize": "3",
+            "ptCount": "21",
+            "ptLife": "4",
+            "ptSpread": "3",
+            "ptGrav": "0.2",
+            "webN": "3"
+          },
+          "x": {}
+        }
+      }
+    ],
+    "color": [
+      {
+        "t": 58.104395604395606,
+        "s": {
+          "v": {
+            "cLine": "#f00000",
+            "cSel": "#ffffff",
+            "cText": "#ebebeb",
+            "cBg": "#000000",
+            "wLine": "3",
+            "cool": "300"
+          },
+          "x": {}
+        }
+      }
+    ],
+    "type": [],
+    "words": [
+      {
+        "t": 44.25824175824176,
+        "s": {
+          "v": {
+            "splitSel": "words",
+            "bpm": "117",
+            "speed": "2.4"
+          },
+          "x": {}
+        }
+      }
+    ],
+    "poem": [],
+    "frog": [],
+    "drums": [
+      {
+        "t": 11.373626373626372,
+        "s": {
+          "v": {
+            "drumOn": true,
+            "drVol": "46",
+            "drPitch": "0",
+            "#3": "85",
+            "#4": "0",
+            "#5": "1",
+            "#6": "75",
+            "#7": "0",
+            "#8": "1",
+            "#9": "70",
+            "#10": "0",
+            "#11": "1",
+            "#12": "55",
+            "#13": "0",
+            "#14": "1",
+            "#15": "55",
+            "#16": "0",
+            "#17": "1",
+            "#18": "70",
+            "#19": "0",
+            "#20": "1"
+          },
+          "x": {
+            "pattern": [
+              "1000000000000000",
+              "0000000010000000",
+              "0000000000000000",
+              "0010001000100010",
+              "0000000000000000",
+              "0000000000100000"
+            ],
+            "mutes": [
+              false,
+              false,
+              false,
+              false,
+              false,
+              false
+            ]
+          }
+        }
+      },
+      {
+        "t": 21.46060954571593,
+        "s": {
+          "v": {
+            "drumOn": true,
+            "drVol": "91",
+            "drPitch": "0",
+            "#3": "90",
+            "#4": "-5",
+            "#5": "1.5",
+            "#6": "70",
+            "#7": "-4",
+            "#8": "1.2",
+            "#9": "65",
+            "#10": "-3",
+            "#11": "1.1",
+            "#12": "45",
+            "#13": "-2",
+            "#14": "0.8",
+            "#15": "45",
+            "#16": "-2",
+            "#17": "1",
+            "#18": "75",
+            "#19": "-5",
+            "#20": "1.4"
+          },
+          "x": {
+            "pattern": [
+              "1000001000100000",
+              "0000100000001000",
+              "0000000000000000",
+              "1010101010101011",
+              "0000000000000000",
+              "0000000000000010"
+            ],
+            "mutes": [
+              false,
+              false,
+              false,
+              false,
+              false,
+              false
+            ]
+          }
+        }
+      }
+    ],
+    "amb": [
+      {
+        "t": 11.373626373626372,
+        "s": {
+          "v": {
+            "ambVol": "16",
+            "ambPitch": "0",
+            "#2": "50",
+            "#3": "32",
+            "#4": "50",
+            "#5": "50",
+            "#6": "50",
+            "#7": "50",
+            "#8": "50",
+            "#9": "50",
+            "#10": "50",
+            "#11": "50",
+            "#12": "50",
+            "#13": "50",
+            "#14": "50",
+            "#15": "50",
+            "#16": "50",
+            "#17": "50"
+          },
+          "x": {
+            "on": [
+              true,
+              true,
+              true,
+              true,
+              true,
+              true,
+              true,
+              true
+            ]
+          }
+        }
+      },
+      {
+        "t": 38.98792409430707,
+        "s": {
+          "v": {
+            "ambVol": "37",
+            "ambPitch": "0",
+            "#2": "50",
+            "#3": "32",
+            "#4": "50",
+            "#5": "50",
+            "#6": "50",
+            "#7": "50",
+            "#8": "50",
+            "#9": "50",
+            "#10": "50",
+            "#11": "50",
+            "#12": "50",
+            "#13": "50",
+            "#14": "50",
+            "#15": "50",
+            "#16": "50",
+            "#17": "50"
+          },
+          "x": {
+            "on": [
+              true,
+              true,
+              true,
+              true,
+              true,
+              true,
+              true,
+              true
+            ]
+          }
+        }
+      }
+    ],
+    "inst": [],
+    "pick": [
+      {
+        "t": 0.08241758241758243,
+        "s": {
+          "v": {
+            "pkOn": true,
+            "pkVol": "33",
+            "pkPitch": "0",
+            "pkInst": "Pluck",
+            "pkScale": "Pentatonic",
+            "pkDelayT": "3/16",
+            "pkFb": "45",
+            "pkFx": "35",
+            "pkSize": "60",
+            "pkDamp": "89",
+            "pkRev": "30",
+            "pkSnap": true
+          },
+          "x": {}
+        }
+      },
+      {
+        "t": 21.46060954571593,
+        "s": {
+          "v": {
+            "pkOn": true,
+            "pkVol": "64",
+            "pkPitch": "0",
+            "pkInst": "Breath pad",
+            "pkScale": "Pentatonic",
+            "pkDelayT": "3/16",
+            "pkFb": "45",
+            "pkFx": "35",
+            "pkSize": "60",
+            "pkDamp": "89",
+            "pkRev": "30",
+            "pkSnap": true
+          },
+          "x": {}
+        }
+      }
+    ],
+    "voice": [
+      {
+        "t": 0,
+        "s": {
+          "v": {
+            "vOn": false,
+            "vVol": "55",
+            "vPitch": "1",
+            "vSel": "Microsoft Yaoyao - Chinese (Simplified, PRC)",
+            "vRate": "0.75",
+            "vEcho": "4",
+            "vSpace": "3/16",
+            "vDecay": "68",
+            "vDrift": "1",
+            "vSnap": true
+          },
+          "x": {}
+        }
+      },
+      {
+        "t": 30.7,
+        "s": {
+          "v": {
+            "vOn": true,
+            "vVol": "55",
+            "vPitch": "1",
+            "vSel": "Microsoft Yaoyao - Chinese (Simplified, PRC)",
+            "vRate": "0.75",
+            "vEcho": "4",
+            "vSpace": "3/16",
+            "vDecay": "68",
+            "vDrift": "1",
+            "vSnap": true
+          },
+          "x": {}
+        }
+      },
+      {
+        "t": 38.98792409430707,
+        "s": {
+          "v": {
+            "vOn": true,
+            "vVol": "100",
+            "vPitch": "1",
+            "vSel": "Microsoft Yaoyao - Chinese (Simplified, PRC)",
+            "vRate": "0.75",
+            "vEcho": "4",
+            "vSpace": "3/16",
+            "vDecay": "68",
+            "vDrift": "1",
+            "vSnap": true
+          },
+          "x": {}
+        }
+      }
+    ],
+    "master": [
+      {
+        "t": 21.46060954571593,
+        "s": {
+          "v": {
+            "rvMix": "14",
+            "rvSize": "0",
+            "rvDamp": "51",
+            "rvPre": "20"
+          },
+          "x": {}
+        }
+      }
+    ],
+    "tempo": [
+      {
+        "t": 11.291208791208792,
+        "s": {
+          "v": {
+            "tpMode": "energy",
+            "tpRange": "14",
+            "tpCycle": "9",
+            "pfEnergy": false,
+            "pfSize": false,
+            "pfLevel": false,
+            "pfPop": false,
+            "pfTravel": true
+          },
+          "x": {}
+        }
+      }
+    ]
+  },
+  "audio": {
+    "app": "frog-ism-poem",
+    "type": "audio-preset",
+    "version": 3,
+    "bpm": 117,
+    "master": 70,
+    "kit": "Deep",
+    "drums": true,
+    "pattern": [
+      "1000001000100000",
+      "0000100000001000",
+      "0000000000000000",
+      "1010101010101011",
+      "0000000000000000",
+      "0000000000000010"
+    ],
+    "tracks": [
+      {
+        "vol": 90,
+        "pitch": -5,
+        "decay": 1.5,
+        "mute": false
+      },
+      {
+        "vol": 70,
+        "pitch": -4,
+        "decay": 1.2,
+        "mute": false
+      },
+      {
+        "vol": 65,
+        "pitch": -3,
+        "decay": 1.1,
+        "mute": false
+      },
+      {
+        "vol": 45,
+        "pitch": -2,
+        "decay": 0.8,
+        "mute": false
+      },
+      {
+        "vol": 45,
+        "pitch": -2,
+        "decay": 1,
+        "mute": false
+      },
+      {
+        "vol": 75,
+        "pitch": -5,
+        "decay": 1.4,
+        "mute": false
+      }
+    ],
+    "ambience": {
+      "wind": {
+        "on": true,
+        "vol": 50,
+        "tone": 32
+      },
+      "rain": {
+        "on": true,
+        "vol": 50,
+        "tone": 50
+      },
+      "crackle": {
+        "on": true,
+        "vol": 50,
+        "tone": 50
+      },
+      "drone": {
+        "on": true,
+        "vol": 50,
+        "tone": 50
+      },
+      "metal": {
+        "on": true,
+        "vol": 50,
+        "tone": 50
+      },
+      "pad": {
+        "on": true,
+        "vol": 50,
+        "tone": 50
+      },
+      "glass": {
+        "on": true,
+        "vol": 50,
+        "tone": 50
+      },
+      "arp": {
+        "on": true,
+        "vol": 50,
+        "tone": 50
+      }
+    },
+    "instruments": {
+      "keys": {
+        "on": false,
+        "vol": 60,
+        "tone": 50
+      },
+      "bass": {
+        "on": false,
+        "vol": 60,
+        "tone": 50
+      },
+      "choir": {
+        "on": false,
+        "vol": 60,
+        "tone": 50
+      },
+      "vox": {
+        "on": false,
+        "vol": 60,
+        "tone": 50
+      },
+      "bells": {
+        "on": false,
+        "vol": 60,
+        "tone": 50
+      },
+      "shimmer": {
+        "on": false,
+        "vol": 60,
+        "tone": 50
+      },
+      "tape": {
+        "on": false,
+        "vol": 60,
+        "tone": 50
+      },
+      "grain": {
+        "on": false,
+        "vol": 60,
+        "tone": 50
+      }
+    },
+    "panels": {
+      "swing": "0",
+      "drVol": "91",
+      "drPitch": "0",
+      "ambVol": "37",
+      "ambPitch": "0",
+      "instVol": "80",
+      "instPitch": "0",
+      "instKey": "9",
+      "instMood": "Dreamy major",
+      "dreamDly": "30",
+      "dreamRev": "45",
+      "pkOn": true,
+      "pkInst": "Breath pad",
+      "pkScale": "Pentatonic",
+      "pkVol": "64",
+      "pkPitch": "0",
+      "pkDelayT": "3/16",
+      "pkFb": "45",
+      "pkFx": "35",
+      "pkSize": "60",
+      "pkDamp": "89",
+      "pkRev": "30",
+      "pkSnap": true,
+      "rvMix": "14",
+      "rvSize": "0",
+      "rvDamp": "51",
+      "rvPre": "20"
+    },
+    "voice": {
+      "vOn": true,
+      "vSel": "Microsoft Yaoyao - Chinese (Simplified, PRC)",
+      "vRate": "0.75",
+      "vPitch": "1",
+      "vVol": "100",
+      "vEcho": "4",
+      "vSpace": "3/16",
+      "vDecay": "68",
+      "vDrift": "1",
+      "vSnap": true
+    },
+    "perf": {
+      "tpMode": "energy",
+      "tpRange": "14",
+      "tpCycle": "9",
+      "pfEnergy": false,
+      "pfSize": false,
+      "pfLevel": false,
+      "pfPop": false,
+      "pfTravel": true
+    }
+  },
+  "visual": {
+    "ribN": "6",
+    "trLen": "60",
+    "ptSize": "3",
+    "ptCount": "21",
+    "ptLife": "4",
+    "ptSpread": "3",
+    "ptGrav": "0.2",
+    "webN": "3",
+    "armStyle": "particles",
+    "armInt": "115",
+    "pColor": "#ffffff",
+    "fPaper": "#f3efe6",
+    "fInk": "#1b1b1f",
+    "fText": "16",
+    "fSpeed": "1",
+    "pSize": "40",
+    "cLine": "#f00000",
+    "cSel": "#ffffff",
+    "cText": "#ebebeb",
+    "cBg": "#000000",
+    "wLine": "3",
+    "cool": "300",
+    "fontSel": "'Space Mono', monospace",
+    "fSize": "50",
+    "fVar": "30",
+    "splitSel": "phrases",
+    "bpm": "117",
+    "speed": "1.6",
+    "pSpeed": "1",
+    "camOp": "21",
+    "ovSrc": "none",
+    "ovOp": "33",
+    "ovBlend": "source-over",
+    "lineOp": "100",
+    "lineFill": "solid",
+    "fSync": true,
+    "pAuto": true,
+    "pSync": true
+  },
+  "text": "The body remembers what the mind forgets. Clay holds the shape of a hand. Light travels without memory. A machine dreams in the dark. Every touch is a kind of writing. We walk along the edge of memory. The wind scatters names. Dust learns the language of rain. Somewhere a door is still open. Your shadow arrives before you do. Silence has a weight and a grain.",
+  "fonts": []
+}
