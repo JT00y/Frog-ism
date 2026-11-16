@@ -40,7 +40,7 @@
   #side h1{font-size:13px;font-weight:400;letter-spacing:.3em;margin:0 0 2px;color:#ddd}
   #side .sub{font-size:11px;color:#777;margin:0;line-height:1.5}
   #side .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-  #side .top button{padding:4px 12px;font-size:11px}
+  #side .top button{padding:4px 12px;font-size:11px;white-space:nowrap;flex:none}
   .panel{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;border:1px solid #333;border-radius:10px;padding:14px 16px;font-size:13px;color:#bbb;text-align:left}
   .panel h3{margin:0;font-size:11px;font-weight:400;letter-spacing:.3em;color:#777}
   .panel label{display:flex;align-items:center;justify-content:space-between;gap:12px}
@@ -193,6 +193,44 @@
   #modal .mrow{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
   #modal .mrow button{padding:7px 14px;font-size:13px}
   #mSave{border-color:#fff;color:#fff}
+  /* ---- start page credit ---- */
+  #start .credit{display:flex;gap:14px;align-items:center;justify-content:center;font-size:12px;letter-spacing:.3em;color:#cfcfcf;margin-top:-4px}
+  #start .credit a{display:inline-flex;align-items:center;gap:7px;color:#f2f2f2;text-decoration:none;letter-spacing:.06em;padding:5px 13px 5px 11px;border-radius:999px}
+  #start .credit a:hover{background:rgba(255,255,255,.88);color:#111}
+
+  /* ---- liquid glass: frosted, see-through surfaces with bright edges ---- */
+  :root{--g-fill:linear-gradient(140deg,rgba(255,255,255,.13) 0%,rgba(255,255,255,.035) 42%,rgba(255,255,255,.07) 100%);--g-tint:rgba(16,16,24,.36);--g-edge:rgba(255,255,255,.24);
+        --g-lift:inset 0 1px 0 rgba(255,255,255,.42),inset 0 -1px 0 rgba(255,255,255,.07),inset 1px 0 0 rgba(255,255,255,.10),inset -1px 0 0 rgba(255,255,255,.04),0 12px 40px rgba(0,0,0,.42)}
+  #side,#audio,#tl,#perf,#modal .mbox,#toast{background:var(--g-fill),var(--g-tint) !important;-webkit-backdrop-filter:blur(26px) saturate(175%) brightness(1.06);backdrop-filter:blur(26px) saturate(175%) brightness(1.06);border:1px solid var(--g-edge) !important;box-shadow:var(--g-lift)}
+  #side{border-left:none !important;border-radius:0 24px 24px 0}
+  #audio,#tl{border-bottom:none !important;border-radius:24px 24px 0 0}
+  #perf{border-radius:22px}
+  #modal .mbox{border-radius:24px}
+  #toast{border-radius:999px;color:#f4f4f4 !important;padding:9px 18px}
+  #modal{background:rgba(0,0,0,.35);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+  button,label.btn,#start .credit a{background:linear-gradient(180deg,rgba(255,255,255,.17),rgba(255,255,255,.045));border:1px solid rgba(255,255,255,.26);color:#f2f2f2;
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.45),inset 0 -1px 0 rgba(255,255,255,.06),0 3px 12px rgba(0,0,0,.28);-webkit-backdrop-filter:blur(14px) saturate(170%);backdrop-filter:blur(14px) saturate(170%);transition:background .18s,color .18s,box-shadow .18s}
+  #bar button{background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.05)),rgba(16,16,24,.30)}
+  button:hover,label.btn:hover,#bar button:hover{background:rgba(255,255,255,.9);color:#111;box-shadow:inset 0 1px 0 #fff,0 4px 18px rgba(255,255,255,.18)}
+  .atabs button.on,.tg.on,.mbtn.on,#perf .seg button.on,.arow .tg.on{background:rgba(255,255,255,.88) !important;color:#111 !important}
+  .kf{background:none !important;border:none !important;box-shadow:none !important;-webkit-backdrop-filter:none;backdrop-filter:none}
+  .panel,.pbar{background:linear-gradient(160deg,rgba(255,255,255,.075),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.13);border-radius:18px;box-shadow:inset 0 1px 0 rgba(255,255,255,.14)}
+  .pbar{border-radius:14px}
+  select,input[type=number],.panel select,.acol select,.atab select,#perf select{background:rgba(255,255,255,.08) !important;color:#f0f0f0;border:1px solid rgba(255,255,255,.2) !important;border-radius:9px !important}
+  option,optgroup{background:#17171f;color:#eee}
+  input[type=range],input[type=checkbox]{accent-color:#f4f4f4}
+  .stp{background:rgba(255,255,255,.07)}
+  .stp.b{background:rgba(255,255,255,.12)}
+  .stp.on{background:#f2f2f2}
+  .tlrow{border-bottom-color:rgba(255,255,255,.06)}
+  #previewBox,#linePrev{border-radius:12px}
+  /* ---- Visual panel rows shrink with the panel: sliders and menus give way, the values stay inside ---- */
+  .panel label{min-width:0}
+  .panel label > .r{flex:0 1 auto;min-width:0;justify-content:flex-end}
+  .panel .r input[type=range],.panel label > input[type=range]{flex:0 1 110px;width:110px;min-width:44px}
+  .panel .val{flex:none}
+  .panel label > select{flex:0 1 150px;min-width:64px;max-width:150px;width:auto}
+  .panel label > input[type=color]{flex:none}
 </style>
 </head>
 <body class="landing">
@@ -248,6 +286,13 @@
   <canvas id="heroFrog3" style="display:none"></canvas>
   <h1>FROG-ISM POEM</h1>
   <div class="tag">A BODY-BASED DIGITAL PERFORMANCE INSTRUMENT</div>
+  <div class="credit">
+    <span>JIATONG YAO</span>
+    <a href="https://www.instagram.com/yxxjixtxng/" target="_blank" rel="noopener noreferrer" title="Jiatong Yao on Instagram">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg>
+      @yxxjixtxng
+    </a>
+  </div>
   <div class="how">ABOUT THE PERFORMANCE</div>
   <p>Frog-ism Poem is an experimental solo performance exploring the relationship between the body, language, technology, and sound. Drawing on experiences and anxieties surrounding women in technology and academia, the work transforms written texts into live poetic compositions through bodily gestures.</p>
   <div class="how">HOW THE SYSTEM WORKS</div>
@@ -410,6 +455,8 @@
     <label class="btn">Load 3D frog (.glb)<input id="glbFile" type="file" accept=".glb,.gltf" hidden></label>
     <button id="glbReset">Use default frog</button>
     <label>3D spin speed <input type="range" id="fSpin" min="0" max="3" step="0.1" value="0.5"></label>
+    <label>Turn with my energy <input type="checkbox" id="fEnergy" checked></label>
+    <label>Energy turn amount <span class="r"><input type="range" id="fEAmt" min="0" max="200" value="100"><b class="val" id="fEAmtV"></b></span></label>
     <div class="note" id="glbStat">Using the paper frog.</div>
     <div class="note" id="frogStat">Frog view closed.</div>
   </div>
@@ -711,7 +758,7 @@ $("about").onclick = () => askRestart();
 
 // ---------- Settings (remembered between visits) ----------
 const SETTINGS = ["ribN", "trLen", "ptSize", "ptCount", "ptLife", "ptSpread", "ptGrav", "webN", "armStyle", "armInt", "pColor", "fPaper", "fInk", "fText", "fSpeed", "pSize", "cLine", "cSel", "cText", "cBg", "wLine", "cool", "fontSel", "fSize", "fVar", "splitSel", "bpm", "speed", "pSpeed",
-                  "camMirror", "camOp", "ovSrc", "ovOp", "ovBlend", "lineOp", "lineFill"];
+                  "fEnergy", "fEAmt", "camMirror", "camOp", "ovSrc", "ovOp", "ovBlend", "lineOp", "lineFill"];
 // every visit starts from the defaults: nothing about sound, visuals or the timeline is kept in the browser
 try { ["armPoem", "armPoem2", "armPoem3", "frogAudio", "frogAudio2", "frogTimeline"].forEach(k => localStorage.removeItem(k)); } catch (e) {}
 const saveSettings = () => {};
@@ -724,6 +771,7 @@ function showVals() {
   $("speedV").textContent = (+$("speed").value).toFixed(1) + "×";
   $("pSizeV").textContent = $("pSize").value + "px";
   $("armIntV").textContent = $("armInt").value + "%";
+  $("fEAmtV").textContent = $("fEAmt").value + "%";
   ["ribN", "trLen", "ptSize", "ptCount", "ptLife", "ptSpread", "ptGrav", "webN"].forEach(id => { $(id + "V").textContent = $(id).value; });
   document.querySelectorAll(".sp2").forEach(e => e.classList.toggle("on", e.dataset.st === $("armStyle").value));
   $("fTextV").textContent = $("fText").value + "px";
@@ -1131,7 +1179,7 @@ function openFrogWindow() {   // must be called from a click, otherwise the brow
   cv.style.cursor = "grab"; cv.style.touchAction = "none";   // drag = turn the 3D frog, double-click = back to auto sway, F = fullscreen
   cv.onpointerdown = e => {
     if (!glb) return; cv.setPointerCapture(e.pointerId);
-    const o = { x: e.clientX, y: e.clientY, yaw: glb.holder.rotation.y, pitch: glb.holder.rotation.x };
+    const o = { x: e.clientX, y: e.clientY, yaw: glb.baseY || 0, pitch: glb.baseX || 0 };   // the base direction; the energy turn keeps adding on top
     cv.onpointermove = m => { glb.manual = true; glb.yaw = o.yaw + (m.clientX - o.x) * 0.01; glb.pitch = Math.max(-1.4, Math.min(1.4, o.pitch + (m.clientY - o.y) * 0.01)); };
     cv.onpointerup = () => { cv.onpointermove = null; };
   };
@@ -1144,7 +1192,18 @@ function frogLines(i) {   // which poem lines live on facet i
   const mine = poem.filter((_, j) => j % FROG.facets.length === i).slice(-12);
   return mine.length ? mine : [poem[i % poem.length]];
 }
+// your movement energy turns the frog: fast moves spin it up, it keeps some momentum and slows down when you are still
+const FE = { vel: 0, y: 0, x: 0, z: 0 };
+function energyTurn(dt) {
+  const on = $("fEnergy").checked, amt = $("fEAmt").value / 100, E = on && feat.active ? feat.energy : 0, sec = Math.min(dt, 100) / 1000, t = performance.now() / 1000;   // capped: a slow frame cannot make it jump
+  FE.vel += (E * amt * 4 - FE.vel) * Math.min(1, sec * 1.6);   // up to about 4 rad/s at full energy
+  FE.y += FE.vel * sec;
+  const tilt = Math.min(1, FE.vel / 4);
+  FE.x += (Math.sin(t * 2.3) * 0.35 * tilt - FE.x) * Math.min(1, sec * 4);
+  FE.z += (Math.sin(t * 1.7) * 0.22 * tilt - FE.z) * Math.min(1, sec * 4);
+}
 function tickFrog(dt) {
+  energyTurn(dt);
   if (fw && fw.closed) { fw = null; fg = null; }
   const open = frogOpen(), label = open ? "🐸 Frog view ✓" : "🐸 Frog view";
   if ($("frogBtn").textContent !== label) $("frogBtn").textContent = label;
@@ -1164,7 +1223,8 @@ function tickFrog(dt) {
 function drawFrogView(g, W, H, fs) {
   g.fillStyle = $("cBg").value; g.fillRect(0, 0, W, H);
   const b = FROG.box, S = Math.min(W / (b.w + 60), H / (b.h + 60));
-  g.save(); g.translate((W - b.w * S) / 2 - b.x * S, (H - b.h * S) / 2 - b.y * S); g.scale(S, S);
+  g.save(); g.translate(W / 2, H / 2); g.rotate(FE.y + FE.z); g.translate(-W / 2, -H / 2);   // the paper frog turns with your energy too
+  g.translate((W - b.w * S) / 2 - b.x * S, (H - b.h * S) / 2 - b.y * S); g.scale(S, S);
   const paper = $("fPaper").value, ink = $("fInk").value, rgb = hexToRgb(paper), rowH = fs * 1.55, placeholder = !poem.length;
   g.font = `${fs}px ${curFont}`; g.textBaseline = "middle";
   FROG.facets.forEach((f, i) => {
@@ -1255,9 +1315,12 @@ function render3D(PW, PH, dt, fs) {   // drawn off-screen in this page, then cop
   if (gl3.rw !== RW || gl3.rh !== RH) { gl3.renderer.setPixelRatio(1); gl3.renderer.setSize(RW, RH, false); gl3.camera.aspect = RW / RH; gl3.camera.updateProjectionMatrix(); gl3.rw = RW; gl3.rh = RH; }
   gl3.scene.background = new THREE.Color($("cBg").value);
   const spin = +$("fSpin").value * dt / 1000;
-  if (glb.manual) glb.holder.rotation.set(glb.pitch || 0, glb.yaw || 0, 0);   // the user turned it with the mouse
-  else if (glb.sway) { glb.phase = (glb.phase || 0) + spin * 1.5; glb.holder.rotation.y = Math.sin(glb.phase) * 0.75; glb.holder.rotation.x = 0; }   // flat model: sway instead of a full turn
-  else glb.holder.rotation.y += spin;
+  let by, bx = 0;   // base direction: set with the mouse, or the automatic sway / spin
+  if (glb.manual) { by = glb.yaw || 0; bx = glb.pitch || 0; }
+  else if (glb.sway) { glb.phase = (glb.phase || 0) + spin * 1.5; by = Math.sin(glb.phase) * 0.75; }   // flat model: sway instead of a full turn
+  else { glb.autoY = (glb.autoY || 0) + spin; by = glb.autoY; }
+  glb.baseY = by; glb.baseX = bx;
+  glb.holder.rotation.set(bx + FE.x, by + FE.y, FE.z);   // + the turn that comes from your movement
   glb.parts.forEach(q => paintPart(q, fs));   // the poem scrolls across the texture
   gl3.renderer.render(gl3.scene, gl3.camera);
   fg.setTransform(1, 0, 0, 1, 0, 0); fg.drawImage(gl3.cvs, 0, 0, PW, PH);
